@@ -1,0 +1,54 @@
+html {
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+    font-size: 15px;
+}
+body {
+    background-color: rgba(245, 245, 245, 1);
+}
+
+h2 {
+    margin: 1rem 1rem 2rem 1rem;
+}
+
+.vts-labeled-container {
+    position: relative;
+    margin: 1rem;
+    padding: 1rem;
+    width: max-content;
+    border: 0.1rem solid darkgray;
+    border-radius: 0.5rem;
+    font-size: 1rem;
+    background-color: inherit;
+}
+.vts-labeled-container > .vts-span {
+    position: absolute;
+    margin: 0;
+    padding: 0 0.5rem;
+    left: 1rem;
+    top: -0.7rem;
+    background-color: inherit;
+}
+
+.vts-labeled-text-input,
+.vts-labeled-password-input {
+    display: flex;
+    flex-direction: column;
+    margin: 0 0 1rem 0;
+    padding: 0;
+}
+.vts-labeled-text-input:first-of-type,
+.vts-labeled-password-input:first-of-type {
+    margin: 1rem 0 1rem 0;
+}
+.vts-labeled-text-input > .vts-label,
+.vts-labeled-password-input > .vts-label {
+    margin: 0 0 0.25rem 0.2rem;
+}
+.vts-labeled-text-input > .vts-text-input,
+.vts-labeled-password-input > .vts-password-input {
+    font-size: 1rem;
+}
+
+.vts-button {
+    font-size: 1rem;
+}
