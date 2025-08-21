@@ -2106,7 +2106,7 @@ export class AEventBus<EventMap extends Record<keyof EventMap, AnyType>> impleme
     }
 
     /** @inheritdoc */
-    public off<K extends keyof EventMap>(type: K, listener: (eventData: EventMap[K]) => AnyType): this {
+    public off<K extends keyof EventMap>(type: K, listener: (eventData: EventMap[K], event: EventBusEvent) => AnyType): this {
         const index = this.wrappedListeners.findIndex(e => e[0] === listener);
         if (index !== -1) {
             this.bus.off(type, this.wrappedListeners[index][1]);

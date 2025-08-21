@@ -1474,7 +1474,7 @@ export interface IEventBus<EventMap extends Record<keyof EventMap, AnyType>> {
      * @param listener Listener function.
      * @returns This instance.
      */
-    off<K extends keyof EventMap>(type: K, listener: (eventData: EventMap[K]) => AnyType): this;
+    off<K extends keyof EventMap>(type: K, listener: (eventData: EventMap[K], event: EventBusEvent) => AnyType): this;
 
     /**
      * Suspends an event listener if it can be found in the internal list of listeners _and_ if it

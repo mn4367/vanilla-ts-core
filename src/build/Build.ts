@@ -101,7 +101,7 @@ type CSSFileProcessingOptions = {
      *   function receives the fully resolved filename of the CSS input file as the first parameter
      *   and the fully resolved path of `RelativeTo` as the second parameter (unless `RelativeTo` is
      *   an empty string, in which case the second parameter is also an empty string). It's not
-     *   necessary to terminate the return value with `\n` but the retun value itself can be
+     *   necessary to terminate the return value with `\n` but the return value itself can be
      *   formatted as desired (e.g. with multiple lines, indentation etc.). Make sure, that the
      *   return value conforms to valid CSS.
      *
@@ -132,7 +132,7 @@ type CSSFileProcessingOptions = {
      *   function receives the fully resolved filename of the CSS input file as the first parameter
      *   and the fully resolved path of `RelativeTo` as the second parameter (unless `RelativeTo` is
      *   an empty string, in which case the second parameter is also an empty string). It's not
-     *   necessary to terminate the return value with `\n` but the retun value itself can be
+     *   necessary to terminate the return value with `\n` but the return value itself can be
      *   formatted as desired (e.g. with multiple lines, indentation etc.). Make sure, that the
      *   return value conforms to valid CSS.
      *
