@@ -747,47 +747,53 @@ export abstract class AElementComponent<T extends (HTMLElementWithChildren | HTM
     }
 
     /** @inheritdoc */
-    public addClass(...classes: string[]): this {
-        const clazzes = classes.map(e => e.trim()).filter(e => e !== "");
-        if (clazzes.length > 0) {
-            this._dom.classList.add(...clazzes);
-        }
+    public addClass(...classes: (string | null | undefined)[]): this {
+        const clazzes = classes
+            .filter(e => e !== null && e !== undefined)
+            .map(e => e.trim())
+            .filter(e => e !== "");
+        clazzes.length === 0 || this._dom.classList.add(...clazzes);
         return this;
     }
 
     /** @inheritdoc */
-    public removeClass(...classes: string[]): this {
-        this._dom.classList.remove(...classes.map(e => e.trim()).filter(e => e !== ""));
-        this._dom.getAttribute("class")?.trim() === ""
-            ? this._dom.removeAttribute("class")
-            : undefined;
+    public removeClass(...classes: (string | null | undefined)[]): this {
+        this._dom.classList.remove(
+            ...classes
+                .filter(e => e !== null && e !== undefined)
+                .map(e => e.trim())
+                .filter(e => e !== "")
+        );
+        this._dom.getAttribute("class")?.trim() !== "" || this._dom.removeAttribute("class");
         return this;
     }
 
     /** @inheritdoc */
-    public replaceClass(clazz: string, withClass: string): this {
-        const c = clazz.trim();
-        const w = withClass.trim();
-        if (c !== "" && w !== "") {
+    public replaceClass(clazz: string | null | undefined, withClass: string | null | undefined): this {
+        const c = clazz?.trim();
+        const w = withClass?.trim();
+        if (c && w) {
             this._dom.classList.replace(c, w);
         }
         return this;
     }
 
     /** @inheritdoc */
-    public toggleClass(...classes: string[]): this {
-        for (const clazz of classes.map(e => e.trim()).filter(e => e !== "")) {
+    public toggleClass(...classes: (string | null | undefined)[]): this {
+        for (const clazz of classes.filter(e => e !== null && e !== undefined).map(e => e.trim()).filter(e => e !== "")) {
             this._dom.classList.toggle(clazz);
         }
-        this._dom.getAttribute("class")?.trim() === ""
-            ? this._dom.removeAttribute("class")
-            : undefined;
+        this._dom.getAttribute("class")?.trim() !== "" || this._dom.removeAttribute("class");
         return this;
     }
 
     /** @inheritdoc */
-    public hasClass(...classes: string[]): boolean {
-        for (const clazz of classes) {
+    public hasClass(...classes: (string | null | undefined)[]): boolean {
+        const clazzes = classes.filter(e => e !== null && e !== undefined).map(e => e.trim()).filter(e => e !== "");
+        if (clazzes.length === 0) {
+            return false;
+        }
+        for (const clazz of clazzes) {
             if (!this._dom.classList.contains(clazz)) {
                 return false;
             }

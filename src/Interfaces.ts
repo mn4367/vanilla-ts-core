@@ -841,47 +841,53 @@ export interface IElementComponent<T extends HTMLElement, EventMap extends Event
     readonly DefaultCSSClassName: string;
 
     /**
-     * Add class name(s) to the class list of the underlying HTML element. All class names are
-     * trimmed and if a trimmed class name is an empty string, it will be ignored.
+     * Add class name(s) to the class list of the underlying HTML element. All elements of `classes`
+     * that are `null` or `undefined` are ignored. All class names are trimmed and if a trimmed
+     * class name is an empty string, it will be ignored.
      * @param classes The name of the class(es) to be added.
      * @returns This instance.
      */
-    addClass(...classes: string[]): this;
+    addClass(...classes: (string | null | undefined)[]): this;
 
     /**
-     * Remove class name(s) from the class list of the underlying HTML element. All class names are
-     * trimmed and if a trimmed class name is an empty string, it will be ignored.
+     * Remove class name(s) from the class list of the underlying HTML element. All elements of
+     * `classes` that are `null` or `undefined` are ignored. All class names are trimmed and if a
+     * trimmed class name is an empty string, it will be ignored.
      * @param classes The name of the class(es) to be removed.
      * @returns This instance.
      */
-    removeClass(...classes: string[]): this;
+    removeClass(...classes: (string | null | undefined)[]): this;
 
     /**
      * Replaces a class name in the class list of the underlying HTML element with another class
-     * name. Both class names are trimmed and if at least one of the trimmed class names is an empty
-     * string, the function does nothing.
+     * name. If `clazz` or `withClass` (or both) is `null` or `undefined`, the function does
+     * nothing. Both class names are trimmed and if at least one of the trimmed class names is an
+     * empty string, the function does nothing.
      * @param clazz The name of the class to be replaced.
      * @param withClass The name of the class, that replaces the former class name.
      * @returns This instance.
      */
-    replaceClass(clazz: string, withClass: string): this;
+    replaceClass(clazz: string | null | undefined, withClass: string | null | undefined): this;
 
     /**
-     * Toggles class name(s) in the class list of the underlying HTML element. All class names are
-     * trimmed and if a trimmed class name is an empty string, it will be ignored.
+     * Toggles class name(s) in the class list of the underlying HTML element. All elements of
+     * `classes` that are `null` or `undefined` are ignored. All class names are trimmed and if a
+     * trimmed class name is an empty string, it will be ignored.
      * @param classes The name of the class(es) to be toggled.
      * @returns This instance.
      */
-    toggleClass(...classes: string[]): this;
+    toggleClass(...classes: (string | null | undefined)[]): this;
 
     /**
      * Checks, if the class name(s) is/are contained in the class list of the underlying HTML
-     * element.
+     * element. All elements of `classes` that are `null` or `undefined` are ignored. All class
+     * names are trimmed and if a trimmed class name is an empty string, it will be ignored.
      * @param classes The name of the class(es) to be searched for.
      * @returns `true` if _all_ of the class names specified in `...classes` are contained in the
-     * class list of the underlying HTML file, otherwise `false`.
+     * class list of the underlying HTML file, otherwise `false`. `false` is also returned, if the
+     * evaluation of `classes` (see above) returns an empty array.
      */
-    hasClass(...classes: string[]): boolean;
+    hasClass(...classes: (string | null | undefined)[]): boolean;
 
     /**
      * Add/set/remove a string attribute of the underlying HTML element.
