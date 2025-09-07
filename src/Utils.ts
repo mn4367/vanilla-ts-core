@@ -377,3 +377,19 @@ export function getDebouncedFnc<F extends (...args: AnyType) => AnyType>(fnc: F,
 
     return [debouncedFnc, cancel, immediate, active];
 }
+
+/** Type of a UUID. */
+export type UUID = `${string}-${string}-${string}-${string}-${string}`;
+
+/**
+ * A function that returns a UUID.
+ * @returns A UUID in RFC version 4 format.
+ */
+export const generateUUID: () => UUID =
+    typeof crypto !== "undefined" && crypto.randomUUID
+        ? crypto.randomUUID.bind(crypto)
+        : () => {
+            return <UUID>"10000000-1000-4000-8000-100000000000".replace(/[018]/g, c =>
+                (+c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> +c / 4).toString(16)
+            );
+        };

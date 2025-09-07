@@ -918,6 +918,7 @@ export abstract class StepAttr<T extends HTMLInputElement, EventMap extends HTML
     /**
      * Get/set the `step` attribute value of the component. `null` or an empty string removes the
      * attribute.
+     * @see https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/input/number#controlling_step_size
      */
     public get Step(): string {
         return this._dom.step;
@@ -930,6 +931,7 @@ export abstract class StepAttr<T extends HTMLInputElement, EventMap extends HTML
     /**
      * Set `step` attribute value of the component.
      * @param v The value to be set. `null` or an empty string removes the attribute.
+     * @see https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/input/number#controlling_step_size
      * @returns This instance.
      */
     public step(v: NullableString): this {
