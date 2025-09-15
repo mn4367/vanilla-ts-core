@@ -38,7 +38,7 @@ import {
 } from "./Types.js";
 import {
     mixin,
-    mixinDOMAttributes,
+    mixinDOMProperties,
     toKebapCase
 } from "./Utils.js";
 
@@ -700,7 +700,7 @@ export abstract class AGlobalDOMAttributes<T extends HTMLElement, EventMap exten
 export abstract class AElementComponent<T extends (HTMLElementWithChildren | HTMLElementVoid), EventMap extends EventMapVoid = HTMLElementEventMap> extends ANodeComponent<T, EventMap> implements IElementComponent<T, EventMap> { // eslint-disable-line @typescript-eslint/no-unsafe-declaration-merging
     static {
         /** Mixin additional global DOM attributes */
-        mixinDOMAttributes(AElementComponent, AGlobalDOMAttributes);
+        mixinDOMProperties(AElementComponent, AGlobalDOMAttributes);
     }
 
     /** @see Instance property {@link AElementComponent.DefaultCSSClassName}. */

@@ -37,13 +37,16 @@ import {
 
 /**
  * This file contains various abstract classes that have default implementations of DOM attributes
- * that are used in some DOM components. These attributes are added as mixins to some DOM components
- * to avoid repeating the code in the components themselves.\
+ * and properties that are used in some DOM components. These attributes/properties are added as
+ * mixins to some DOM components to avoid repeating the code in the components themselves.\
  * To prevent circular dependencies and reference/initialization errors due to module
  * loading/execution these classes must not be used from classes in this project!
- * @todo Extend with more DOM attributes.
+ * @todo Extend with more DOM attributes/properties.
  */
 
+
+/////////////////////////////
+// #region Attributes
 
 /**
  * 'Alt' getter/setter and set method returning this instance.
@@ -1106,3 +1109,62 @@ export abstract class WidthHeightAttr<T extends HTMLElementWithSWidthHeight | HT
         return this;
     }
 }
+// #endregion Attibutes
+/////////////////////////////
+
+
+/////////////////////////////
+// #region Properties
+/**
+ * 'SelectionStart' getter/setter and set method returning this instance.
+ */
+export abstract class SelectionStartProp<T extends HTMLInputElement | HTMLTextAreaElement, EventMap extends HTMLElementEventMap = HTMLElementEventMap> extends AElementComponent<T, EventMap> {
+    /**
+     * Get/set the `selectionStart` property value of the component.
+     */
+    public get SelectionStart(): NullableNumber {
+        return this._dom.selectionStart;
+    }
+    /** @inheritdoc */
+    public set SelectionStart(v: NullableNumber) {
+        this.selectionStart(v);
+    }
+
+    /**
+     * Set `selectionStart` property value of the component.
+     * @param v The value to be set.
+     * @returns This instance.
+     */
+    public selectionStart(v: NullableNumber): this {
+        this._dom.selectionStart = v;
+        return this;
+    }
+}
+
+/**
+ * 'SelectionEnd' getter/setter and set method returning this instance.
+ */
+export abstract class SelectionEndProp<T extends HTMLInputElement | HTMLTextAreaElement, EventMap extends HTMLElementEventMap = HTMLElementEventMap> extends AElementComponent<T, EventMap> {
+    /**
+     * Get/set the `selectionEnd` property value of the component.
+     */
+    public get SelectionEnd(): NullableNumber {
+        return this._dom.selectionEnd;
+    }
+    /** @inheritdoc */
+    public set SelectionEnd(v: NullableNumber) {
+        this.selectionEnd(v);
+    }
+
+    /**
+     * Set `selectionEnd` property value of the component.
+     * @param v The value to be set.
+     * @returns This instance.
+     */
+    public selectionEnd(v: NullableNumber): this {
+        this._dom.selectionEnd = v;
+        return this;
+    }
+}
+// #endregion Properties
+/////////////////////////////

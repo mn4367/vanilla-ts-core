@@ -146,21 +146,21 @@ export function mixin<
 }
 
 /**
- * Merges all DOM attributes from an array of DOM component classes into a single DOM component
+ * Merges all DOM properties from an array of DOM component classes into a single DOM component
  * class. This function basically does nothing else than `mixin()`, it only exists to be used
- * explicitly for merging DOM attributes into existing DOM components, it should not be used
+ * explicitly for merging DOM properties into existing DOM components, it should not be used
  * for other tasks/in other contexts.
- * @param component The component _into which_ the DOM attributes are to be merged.
- * @param components The components _from which_ the DOM attributes are to be merged. These classes
+ * @param component The component _into which_ the DOM properties are to be merged.
+ * @param components The components _from which_ the DOM properties are to be merged. These classes
  * shouldn't be real components, only extensions from `ANodeComponent` or `AElementComponent` which
  * contain nothing more than the implementation of only a single DOM attribute.
- * @returns `component` which is extended with a merge of all DOM attributes from `classes`,
+ * @returns `component` which is extended with a merge of all DOM properties from `classes`,
  * excluding their constructors. `component` will still have its original constructor.
  * @see Function `mixin()` and the classes `Checkbox` in `Checkbox.ts`, `Input` in `Input.ts` (both
  * in _@vanilla-ts/dom_) and `CheckedAttr` in `DOMAttributes.ts` in this project for examples for
  * using this technique.
  */
-export function mixinDOMAttributes<
+export function mixinDOMProperties<
     T extends Ctor<INodeComponent<HTMLElement>>,
     R extends Ctor<INodeComponent<HTMLElement>>[],
     ResultCtor = T extends Constructor<unknown>
