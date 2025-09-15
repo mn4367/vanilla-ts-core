@@ -565,10 +565,10 @@ export async function concatCSS(options: ConcatCSSOptions): Promise<string[]> {
                 ? fg.globSync(opts.IgnoreSourceFiles.Pattern, opts.IgnoreSourceFiles.GlobOptions)
                 : []).map(e => path.resolve(e));
             const modules = imports.Modules.filter(e => !ignoredModules.includes(e));
-            !opts.Debug.Modules || console.error("[concatCSS] modules:", imports.Modules);
-            !opts.Debug.Ignored || console.error("[concatCSS] ignored:", ignoredModules);
-            !opts.Debug.Used || console.error("[concatCSS] used:", modules);
-            !opts.Debug.Warnings || console.error("[concatCSS] warnings:", imports.Warnings);
+            opts.Debug.Modules && console.error("[concatCSS] modules:", imports.Modules);
+            opts.Debug.Ignored && console.error("[concatCSS] ignored:", ignoredModules);
+            opts.Debug.Used && console.error("[concatCSS] used:", modules);
+            opts.Debug.Warnings && console.error("[concatCSS] warnings:", imports.Warnings);
             const lookupFiles = (typeof opts.Lookup.Pattern === "string" && opts.Lookup.Pattern !== "") || opts.Lookup.Pattern.length > 0
                 ? fg.globSync(opts.Lookup.Pattern, opts.Lookup.GlobOptions)
                 : [];
@@ -619,7 +619,7 @@ export async function concatCSS(options: ConcatCSSOptions): Promise<string[]> {
             result.pop();
         }
     }
-    !opts.OutputFile || writeFileSync(opts.OutputFile, result.join("\n"));
+    opts.OutputFile && writeFileSync(opts.OutputFile, result.join("\n"));
     return result;
 }
 /* eslint-enable no-irregular-whitespace */

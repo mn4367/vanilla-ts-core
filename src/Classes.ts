@@ -752,7 +752,7 @@ export abstract class AElementComponent<T extends (HTMLElementWithChildren | HTM
             .filter(e => e !== null && e !== undefined)
             .map(e => e.trim())
             .filter(e => e !== "");
-        clazzes.length === 0 || this._dom.classList.add(...clazzes);
+        clazzes.length > 0 && this._dom.classList.add(...clazzes);
         return this;
     }
 
@@ -764,7 +764,7 @@ export abstract class AElementComponent<T extends (HTMLElementWithChildren | HTM
                 .map(e => e.trim())
                 .filter(e => e !== "")
         );
-        this._dom.getAttribute("class")?.trim() !== "" || this._dom.removeAttribute("class");
+        this._dom.getAttribute("class")?.trim() === "" && this._dom.removeAttribute("class");
         return this;
     }
 
@@ -783,7 +783,7 @@ export abstract class AElementComponent<T extends (HTMLElementWithChildren | HTM
         for (const clazz of classes.filter(e => e !== null && e !== undefined).map(e => e.trim()).filter(e => e !== "")) {
             this._dom.classList.toggle(clazz);
         }
-        this._dom.getAttribute("class")?.trim() !== "" || this._dom.removeAttribute("class");
+        this._dom.getAttribute("class")?.trim() === "" && this._dom.removeAttribute("class");
         return this;
     }
 

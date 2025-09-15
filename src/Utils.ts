@@ -342,7 +342,7 @@ export function getDebouncedFnc<F extends (...args: AnyType) => AnyType>(fnc: F,
     let leadingInvoked = false;
 
     const _clearTimeout = (): void => { // eslint-disable-line jsdoc/require-jsdoc
-        !timeoutHandler || clearTimeout(timeoutHandler);
+        timeoutHandler && clearTimeout(timeoutHandler);
         timeoutHandler = undefined;
     };
 
@@ -367,7 +367,7 @@ export function getDebouncedFnc<F extends (...args: AnyType) => AnyType>(fnc: F,
     };
 
     const immediate: (cancel?: boolean) => ReturnType<F> = (cancel: boolean = true): ReturnType<F> => { // eslint-disable-line jsdoc/require-jsdoc
-        !cancel || _clearTimeout();
+        cancel && _clearTimeout();
         return fnc(..._args as AnyType[]); // eslint-disable-line @typescript-eslint/no-unsafe-return,@typescript-eslint/no-unsafe-argument
     };
 
