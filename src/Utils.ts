@@ -393,3 +393,73 @@ export const generateUUID: () => UUID =
                 (+c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> +c / 4).toString(16)
             );
         };
+
+/**
+ * Checks if an object has a property with the value `undefined`.
+ * @param obj The object to be checked.
+ * @param prop The (name of the) property to be checked.
+ * @returns `true` if `obj` has a property `prop` with the value `undefined`, otherwise `false`.
+ */
+export function isUndefined(obj: Record<string | number | symbol, AnyType>, prop: string | number | symbol): boolean {
+    return Object.hasOwn(obj, prop) && obj[prop] === undefined;
+}
+
+/**
+ * Checks if an object has a property with the value `null`.
+ * @param obj The object to be checked.
+ * @param prop The (name of the) property to be checked.
+ * @returns `true` if `obj` has a property `prop` with the value `null`, otherwise `false`.
+ */
+export function isNull(obj: Record<string | number | symbol, AnyType>, prop: string | number | symbol): boolean {
+    return Object.hasOwn(obj, prop) && obj[prop] === null;
+}
+
+/**
+ * Sets the value of an optional property from an object on another object of the same type. A
+ * common use case is to update/create a property of an existing options or configuration object.
+ * The function works as follows:
+ * - After execution `on` will _always_ have a property `prop`.
+ * - If neither `from` nor `on` has `prop` the value of `on[prop]` will be set to `def`.
+ * - If `from` _does not_ have the property `prop` at all, the future value of `on[prop]` depends on
+ *   the current existence of `prop` in `on`: If it doesn't already exist its value will be set to
+ *   `def`, otherwise `on[prop]` remains unchanged.
+ * - If `from` _does_ have the property `prop` but with the value of `undefined`, `on[prop]` will be
+ *   set to `def`.
+ * - If `from` _does_ have the property `prop` and its value is unequal to `undefined`, `on[prop]`
+ *   will be set to `from[prop]`.
+ * @param from The object from which the property value is to be taken.
+ * @param on The object on which the taken property value is to be set.
+ * @param prop The (name of the) property that has the value to be set.
+ * @param def The default value for the property if
+ * - `prop` exists in `from` _and_ has the value `undefined` or
+ * - neither `from` nor `on` has the property `prop`.
+ */
+export function setProp<T extends Record<string | number | symbol, AnyType>, K extends keyof T>(from: T, on: T, prop: K, def: Exclude<T[K], undefined>): void {
+    on[prop] = getProp(from, on, prop, def);
+}
+
+/**
+ * Gets the value of an optional property from an object, taking into account an existing object of
+ * the same type. A common use case is to update/create a property of an existing options or
+ * configuration object with the value returned from this function. The function works as follows:
+ * - If neither `from` nor `ref` has `prop` the returned value is `def`.
+ * - If `from` _does not_ have the property `prop` at all, the returned value depends on the
+ *   current existence of `prop` in `ref`: If it doesn't already exist the returned value is `def`,
+ *   otherwise the returned value is `ref[prop]`.
+ * - If `from` _does_ have the property `prop` but with the value of `undefined`, the returned value
+ *   is `def`.
+ * - If `from` _does_ have the property `prop` and its value is unequal to `undefined`, the returned
+ *   value is `from[prop]`.
+ * @param from The object from which the property value is to be returned.
+ * @param ref The object which may contain the current value of `prop` or not.
+ * @param prop The (name of the) property that is to be returned.
+ * @param def The default value for the property if
+ * - `prop` exists in `from` _and_ has the value `undefined` or
+ * - neither `from` nor `ref` has the property `prop`.
+ * @returns A value depending on the content of `from` and `ref` as described above.
+ */
+export function getProp<T extends Record<string | number | symbol, AnyType>, K extends keyof T>(from: T, ref: T, prop: K, def: Exclude<T[K], undefined>): Exclude<T[K], undefined> {
+    return isUndefined(from, prop) // eslint-disable-line @typescript-eslint/no-unsafe-return
+        ? def
+        : from[prop] ?? ref[prop] ?? def;
+}

@@ -259,8 +259,8 @@ export interface IGlobalDOMAttributes {
      * available on almost all HTML elements so it is made available here as a pseudo DOM property
      * just for convenience. Please also note the requirements explained in the `@see` comment.\
      * The value `false` means that the CSS `resize` property on the component has no explicit value
-     * set, this is valid for both reading and writing the property, however, the behavior is
-     * equivalent to the value `none`.
+     * set, this is valid for both reading and writing the property. For `textarea` elements this
+     * usually means that the element _is_ resizable by default so `none` has to be used explicitly.
      * @see https://developer.mozilla.org/en-US/docs/Web/CSS/resize
      */
     Resizable: ResizableValues;
@@ -271,8 +271,8 @@ export interface IGlobalDOMAttributes {
      * available on almost all HTML elements so it is made available here as a pseudo DOM property
      * just for convenience. Please also note the requirements explained in the `@see` comment.
      * @param v The value to be set. The value `false` means that the CSS `resize` property on the
-     * component has no explicit value set, this is valid for both reading and writing the property,
-     * however, the behavior is equivalent to the value `none`.
+     * component has no explicit value set. For `textarea` elements this usually means that the
+     * element _is_ resizable by default so `none` has to be used explicitly.
      * @returns This instance.
      * @see https://developer.mozilla.org/en-US/docs/Web/CSS/resize
      */
