@@ -70,7 +70,7 @@ export abstract class AltAttr<T extends HTMLElementWithAlt, EventMap extends HTM
      * @returns This instance.
      */
     public alt(v: NullableString): this {
-        this.attrib("alt", v ? v : null);
+        this.attrib("alt", v);
         return this;
     }
 }
@@ -105,7 +105,7 @@ export abstract class AutocompleteAttr<T extends HTMLElementWithAutocomplete, Ev
      * @returns This instance.
      */
     public autocomplete(v: AutocompleteAttributeValues): this {
-        this.attrib("autocomplete", v ? v : null);
+        this.attrib("autocomplete", v);
         return this;
     }
 }
@@ -155,7 +155,7 @@ export abstract class CheckedAttr<T extends HTMLInputElement, EventMap extends H
      * @returns This instance.
      */
     public toggleChecked(): this {
-        this.checked(!this.Checked);
+        this.checked(!this._dom.checked);
         return this;
     }
 }
@@ -188,7 +188,7 @@ export abstract class CrossOrginAttr<T extends HTMLElementWithCrossorigin, Event
      * @returns This instance.
      */
     public crossOrigin(v: CrossOrginAttributeValues): this {
-        this.attrib("dirname", v ? v : null);
+        this.attrib("dirname", v);
         return this;
     }
 }
@@ -284,7 +284,7 @@ export abstract class DirnameAttr<T extends HTMLTextAreaElement | HTMLInputEleme
      * @returns This instance.
      */
     public dirName(v: NullableString): this {
-        this.attrib("dirname", v ? v : null);
+        this.attrib("dirname", v);
         return this;
     }
 }
@@ -311,7 +311,39 @@ export abstract class DownloadAttr<T extends HTMLElementWithDownload, EventMap e
      * @returns This instance.
      */
     public download(v: NullableString): this {
-        this.attrib("download", v ? v : null);
+        this.attrib("download", v);
+        return this;
+    }
+}
+
+/**
+ * 'For' getter/setter and set method returning this instance.
+ */
+export abstract class ForAttr<T extends HTMLLabelElement | HTMLOutputElement, EventMap extends HTMLElementEventMap = HTMLElementEventMap> extends AElementComponent<T, EventMap> {
+    /**
+     * Get/set `for` attribute value of underlying HTML element. When used with `<label>`, the `for`
+     * attribute has a value which is the id of the form element it relates to. When used with an
+     * `<output>`, the `for` attribute has a value which is a space separated list of the id values
+     * of the elements which are used to create the output.
+     */
+    public get For(): NullableString {
+        return this.attr("for");
+    }
+    /** @inheritdoc */
+    public set For(v: NullableString) {
+        this.for(v);
+    }
+
+    /**
+     * Set `for` attribute value of underlying HTML element. When used with `<label>`, the `for`
+     * attribute has a value which is the id of the form element it relates to. When used with
+     * `<output>`, the `for` attribute has a value which is a space separated list of the id values
+     * of the elements which are used to create the output.
+     * @param v The `for` attribute to be set or `null` to remove the attribute.
+     * @returns This instance.
+     */
+    public for(v: NullableString): this {
+        this.attrib("for", v);
         return this;
     }
 }
@@ -338,7 +370,7 @@ export abstract class HrefAttr<T extends HTMLElementWithHref, EventMap extends H
      * @returns This instance.
      */
     public href(v: NullableString): this {
-        this.attrib("href", v ? v : null);
+        this.attrib("href", v);
         return this;
     }
 }
@@ -365,7 +397,7 @@ export abstract class HreflangAttr<T extends HTMLElementWithHreflang, EventMap e
      * @returns This instance.
      */
     public hreflang(v: NullableString): this {
-        this.attrib("hreflang", v ? v : null);
+        this.attrib("hreflang", v);
         return this;
     }
 }
@@ -451,7 +483,7 @@ export abstract class LoadingAttr<T extends HTMLElementWithLoading, EventMap ext
      * @returns This instance.
      */
     public loading(v: LoadingAttributeValues): this {
-        this.attrib("loading", v ? v : null);
+        this.attrib("loading", v);
         return this;
     }
 }
@@ -478,7 +510,7 @@ export abstract class MinMaxAttr<T extends HTMLInputElement, EventMap extends HT
      * @returns This instance.
      */
     public min(v: NullableString): this {
-        this.attrib("min", v ? v : null);
+        this.attrib("min", v);
         return this;
     }
 
@@ -499,7 +531,7 @@ export abstract class MinMaxAttr<T extends HTMLInputElement, EventMap extends HT
      * @returns This instance.
      */
     public max(v: NullableString): this {
-        this.attrib("max", v ? v : null);
+        this.attrib("max", v);
         return this;
     }
 }
@@ -631,7 +663,7 @@ export abstract class NameAttr<T extends HTMLElementWithName, EventMap extends H
      * @returns This instance.
      */
     public name(v: NullableString): this {
-        this.attrib("name", v ? v : null);
+        this.attrib("name", v);
         return this;
     }
 }
@@ -710,7 +742,7 @@ export abstract class PatternAttr<T extends HTMLInputElement, EventMap extends H
      * @returns This instance.
      */
     public pattern(v: NullableString): this {
-        this.attrib("pattern", v ? v : null);
+        this.attrib("pattern", v);
         return this;
     }
 }
@@ -737,7 +769,7 @@ export abstract class PlaceholderAttr<T extends HTMLInputElement | HTMLTextAreaE
      * @returns This instance.
      */
     public placeholder(v: NullableString): this {
-        this.attrib("placeholder", v ? v : null);
+        this.attrib("placeholder", v);
         return this;
     }
 }
@@ -801,7 +833,7 @@ export abstract class ReferrerPolicyAttr<T extends HTMLElementWithReferrerPolicy
      * @returns This instance.
      */
     public referrerPolicy(v: ReferrerPolicyAttributeValues): this {
-        this.attrib("referrerpolicy", v ? v : null);
+        this.attrib("referrerpolicy", v);
         return this;
     }
 }
@@ -828,7 +860,7 @@ export abstract class RelAttr<T extends HTMLElementWithRel, EventMap extends HTM
      * @returns This instance.
      */
     public rel(v: NullableString): this {
-        this.attrib("rel", v ? v : null);
+        this.attrib("rel", v);
         return this;
     }
 }
@@ -909,7 +941,7 @@ export abstract class SrcAttr<T extends HTMLElementWithSrc, EventMap extends HTM
      * @returns This instance.
      */
     public src(v: NullableString): this {
-        this.attrib("src", v ? v : null);
+        this.attrib("src", v);
         return this;
     }
 }
@@ -938,7 +970,7 @@ export abstract class StepAttr<T extends HTMLInputElement, EventMap extends HTML
      * @returns This instance.
      */
     public step(v: NullableString): this {
-        this.attrib("step", v ? v : null);
+        this.attrib("step", v);
         return this;
     }
 
@@ -997,7 +1029,7 @@ export abstract class TargetAttr<T extends HTMLElementWithTarget, EventMap exten
      * @returns This instance.
      */
     public target(v: TargetAttributeValues): this {
-        this.attrib("target", v ? v : null);
+        this.attrib("target", v);
         return this;
     }
 }
@@ -1025,7 +1057,7 @@ export abstract class TypeAttr<T extends HTMLElementWithType, EventMap extends H
      * @returns This instance.
      */
     public type(v: NullableString): this {
-        this.attrib("type", v ? v : null);
+        this.attrib("type", v);
         return this;
     }
 }
