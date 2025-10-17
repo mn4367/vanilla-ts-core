@@ -1041,7 +1041,6 @@ export abstract class TypeAttr<T extends HTMLElementWithType, EventMap extends H
     /**
      * Get/set the `type` attribute of the component. `null` or an empty string removes the
      * attribute.
-     *
      */
     public get Type(): NullableString {
         return this.attr("type");

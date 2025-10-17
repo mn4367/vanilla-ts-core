@@ -1,5 +1,6 @@
 import {
     AnyType,
+    AutoCapitalizeAttrValues,
     ContentEditableAttrValues,
     CSSRuleNames,
     DirAttrValues,
@@ -102,6 +103,18 @@ export interface IDisposable {
  * @todo Extend with more global DOM attributes.
  */
 export interface IGlobalDOMAttributes {
+    /**
+     * Get/set `autocapitalize` attribute value of the component.
+     */
+    AutoCapitalize: AutoCapitalizeAttrValues;
+
+    /**
+     * Set 'autocapitalize' attribute value of the component.
+     * @param v The value to be set.
+     * @returns This instance.
+     */
+    autoCapitalize(v: AutoCapitalizeAttrValues): this;
+
     /**
      * Get/set `autofocus` attribute value of the component.
      */
@@ -279,6 +292,25 @@ export interface IGlobalDOMAttributes {
     resizable(v: ResizableValues): this;
 
     /**
+     * Get/set `spellcheck` attribute value of the component.\
+     * __Note:__ The default value for spellchecking depends on the element type and the
+     * implementation in browsers, so in order to be sure that spellchecking is disabled it has to
+     * be explicitly disabled by setting this property to `false`.
+     */
+    Spellcheck: boolean;
+
+    /**
+     * Set `spellcheck` attribute value of the component.\
+     * __Note:__ The default value for spellchecking depends on the element type and the
+     * implementation in browsers, so in order to be sure that spellchecking is disabled it has to
+     * be explicitly disabled by setting this property to `false`.
+     * @param v The value to be set. `true` enables spellchecking, `false` disables it (the
+     * attribute will explicitly be set to "false").
+     * @returns This instance.
+     */
+    spellcheck(v: boolean): this;
+
+    /**
      * Get/set `tabIndex` attribute value of the component.
      */
     TabIndex: number;
@@ -315,6 +347,23 @@ export interface IGlobalDOMAttributes {
      * @returns This instance.
      */
     translate(v: boolean): this;
+
+    /**
+     * Get/set `writingSuggestions` attribute value of the component.\
+     * __Note:__ Writing suggestions usually are enabled by default in browsers, so they have to be
+     * explicitly disabled by setting this property to `false`.
+     */
+    WritingSuggestions: boolean;
+
+    /**
+     * Set `writingSuggestions` attribute value of the component.\
+     * __Note:__ Writing suggestions usually are enabled by default in browsers, so they have to be
+     * explicitly disabled by setting this property to `false`.
+     * @param v The value to be set. `true` enables writing suggestions, `false` disables it (the
+     * attribute will explicitly be set to "false").
+     * @returns This instance.
+     */
+    writingSuggestions(v: boolean): this;
 }
 
 /**

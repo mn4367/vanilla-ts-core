@@ -305,6 +305,11 @@ export type HTMLInputsWithDataList = "text" | "search" | "url" | "tel" | "email"
 /**
  * Valid values for the DOM attribute `contentEditable`.
  */
+export type AutoCapitalizeAttrValues = "none" | "off" | "sentences" | "on" | "words" | "characters";
+
+/**
+ * Valid values for the DOM attribute `contentEditable`.
+ */
 export type ContentEditableAttrValues = boolean | "" | "plaintext-only";
 
 /**

@@ -21,6 +21,7 @@ import {
 import {
     AnyObject,
     AnyType,
+    AutoCapitalizeAttrValues,
     Constructor,
     ContentEditableAttrValues,
     CSSRuleNames,
@@ -453,6 +454,21 @@ export abstract class ANodeComponent<T extends Node, EventMap extends EventMapVo
  */
 export abstract class AGlobalDOMAttributes<T extends HTMLElement, EventMap extends EventMapVoid = HTMLElementEventMap> extends ANodeComponent<T, EventMap> implements IGlobalDOMAttributes {
     /** @inheritdoc */
+    public get AutoCapitalize(): AutoCapitalizeAttrValues {
+        return <AutoCapitalizeAttrValues>this._dom.autocapitalize;
+    }
+    /** @inheritdoc */
+    public set AutoCapitalize(v: AutoCapitalizeAttrValues) {
+        this._dom.autocapitalize = v;
+    }
+
+    /** @inheritdoc */
+    public autoCapitalize(v: AutoCapitalizeAttrValues): this {
+        this._dom.autocapitalize = v;
+        return this;
+    }
+
+    /** @inheritdoc */
     public get Autofocus(): boolean {
         return this._dom.autofocus;
     }
@@ -648,6 +664,21 @@ export abstract class AGlobalDOMAttributes<T extends HTMLElement, EventMap exten
     }
 
     /** @inheritdoc */
+    public get Spellcheck(): boolean {
+        return this._dom.spellcheck;
+    }
+    /** @inheritdoc */
+    public set Spellcheck(v: boolean) {
+        this.spellcheck(v);
+    }
+
+    /** @inheritdoc */
+    public spellcheck(v: boolean): this {
+        this._dom.spellcheck = v;
+        return this;
+    }
+
+    /** @inheritdoc */
     public get TabIndex(): number {
         return this._dom.tabIndex;
     }
@@ -689,6 +720,21 @@ export abstract class AGlobalDOMAttributes<T extends HTMLElement, EventMap exten
     /** @inheritdoc */
     public translate(v: boolean): this {
         v === false ? this._dom.removeAttribute("translate") : this._dom.translate = true;
+        return this;
+    }
+
+    /** @inheritdoc */
+    public get WritingSuggestions(): boolean {
+        return this._dom.writingSuggestions === "true" || this._dom.writingSuggestions === "";
+    }
+    /** @inheritdoc */
+    public set WritingSuggestions(v: boolean) {
+        this.writingSuggestions(v);
+    }
+
+    /** @inheritdoc */
+    public writingSuggestions(v: boolean): this {
+        this._dom.writingSuggestions = v ? "true" : "false";
         return this;
     }
 }
