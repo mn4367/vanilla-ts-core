@@ -177,7 +177,7 @@ export abstract class ANodeComponent<T extends Node, EventMap extends EventMapVo
     }
 
     /** @inheritdoc */
-    public isContainedIn(component: IElementWithChildrenComponent<HTMLElementWithChildren>): boolean {
+    public isContainedIn(component: IElementComponent<HTMLElement>): boolean {
         let parent = this.Parent;
         while (parent) {
             if (parent === component) {
@@ -192,7 +192,7 @@ export abstract class ANodeComponent<T extends Node, EventMap extends EventMapVo
     public contains(component: INodeComponent<Node>): boolean {
         // Using a 'reversed' `isContainedIn()` is the fastest way. The disadvantage of an
         // 'inappropriate' type cast is accepted in return.
-        return component.isContainedIn(<IElementWithChildrenComponent<HTMLElementWithChildren>><unknown>this);
+        return component.isContainedIn(<IElementComponent<HTMLElement>><unknown>this);
     }
 
     /** @inheritdoc */
@@ -1308,7 +1308,7 @@ export abstract class AChildren<T extends HTMLElementWithChildren, EventMap exte
             const uniques = new Set(components.filter(e => e ?? e)) as Set<INodeComponent<Node>>;
             // Allow children to inspect their parent tree before actually removing them from the DOM.
             for (const component of uniques) {
-                if (component.isContainedIn(<IElementWithChildrenComponent<T>><unknown>this)) {
+                if (component.isContainedIn(<IElementComponent<T>><unknown>this)) {
                     component.onBeforeUnmount();
                 }
             }
@@ -1348,7 +1348,7 @@ export abstract class AChildren<T extends HTMLElementWithChildren, EventMap exte
         // Regular extract of only some components.
         // Allow children to inspect their parent tree before actually removing them from the DOM.
         for (const component of uniques) {
-            if (component.isContainedIn(<IElementWithChildrenComponent<T>><unknown>this)) {
+            if (component.isContainedIn(<IElementComponent<T>><unknown>this)) {
                 component.onBeforeUnmount();
             }
         }

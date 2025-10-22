@@ -676,7 +676,7 @@ export interface INodeComponent<T extends Node, EventMap extends EventMapVoid = 
     /**
      * Determines if this component is contained in the component tree of another component (at any
      * depth).\
-     * __Note:__ It may seem like an error that the type of `component` is only `INodeComponent`,
+     * __Note:__ It may seem like an error that the type of `component` is only `IElementComponent`,
      * although this type does not implement the interface `IChildren`, but it is possible to
      * implement components that do not allow access to contained child elements, but still manage
      * their own component tree internally. Such components may have to 'patch' their internal tree
@@ -686,7 +686,7 @@ export interface INodeComponent<T extends Node, EventMap extends EventMapVoid = 
      * @returns `true`, if this component is contained in the component tree of `component` (at any
      * depth), otherwise `false`.
      */
-    isContainedIn(component: IElementWithChildrenComponent<HTMLElementWithChildren>): boolean;
+    isContainedIn(component: IElementComponent<HTMLElement>): boolean;
 
     /**
      * Determines if this component contains another component in its component tree (at any
