@@ -746,7 +746,7 @@ export abstract class AGlobalDOMAttributes<T extends HTMLElement, EventMap exten
 export abstract class AElementComponent<T extends (HTMLElementWithChildren | HTMLElementVoid), EventMap extends EventMapVoid = HTMLElementEventMap> extends ANodeComponent<T, EventMap> implements IElementComponent<T, EventMap> { // eslint-disable-line @typescript-eslint/no-unsafe-declaration-merging
     static {
         /** Mixin additional global DOM attributes */
-        mixinDOMProperties(AElementComponent, AGlobalDOMAttributes);
+        mixinDOMProperties(this, AGlobalDOMAttributes);
     }
 
     /** @see Instance property {@link AElementComponent.DefaultCSSClassName}. */
@@ -1067,7 +1067,7 @@ const IChildren_DOM = Symbol("IChildren_DOM");
  * // Simple container component that handles children.
  * export class Container extends AElementComponent<HTMLDivElement> {
  *   static {
- *     mixin(false, Container, AChildren);
+ *     mixin(false, this, AChildren);
  *   }
  *   constructor() {
  *     super();
@@ -1081,7 +1081,7 @@ const IChildren_DOM = Symbol("IChildren_DOM");
  * // and a container) that handles children. The children reside in the inner container.
  * export class LabeledContainer extends AElementComponent<HTMLDivElement> {
  *   static {
- *       mixin(false, LabeledContainer, AChildren);
+ *       mixin(false, this, AChildren);
  *   }
  *   private label: Span;
  *   private container: Div;

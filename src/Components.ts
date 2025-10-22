@@ -1,4 +1,5 @@
 import {
+    AChildren,
     AComponentFactory,
     AElementComponentVoid,
     AElementComponentWithChildren,
@@ -7,9 +8,9 @@ import {
 import {
     ComponentType,
     EventMapVoid,
+    IChildren,
     IComponent,
     IElementWithChildrenComponent,
-    IFragment,
     IIsElementComponent,
     INodeComponent
 } from "./Interfaces.js";
@@ -20,7 +21,7 @@ import {
     HTMLElementWithChildren,
     HTMLElementWithChildrenTagName
 } from "./Types.js";
-import { toKebapCase } from "./Utils.js";
+import { mixin, toKebapCase } from "./Utils.js";
 
 
 /**
@@ -233,7 +234,18 @@ export class CSSClassNameFactory extends ComponentFactory<IComponent> {
     }
 
     /**
-     * Get/set the current recursive CSS class name assignment handling.
+     * Set the current prefix for CSS class names.
+     * @param v The current prefix for CSS class names.
+     * @returns This instance.
+     */
+    public cssPrefix(v: string): this {
+        this.#cssPrefix = v;
+        return this;
+    }
+
+    /**
+     * Get/set the current recursive CSS class name assignment handling. If `true` is set, nested
+     * components are handled recursively.
      */
     public get Recursive(): boolean {
         return this.#recursive;
@@ -241,6 +253,16 @@ export class CSSClassNameFactory extends ComponentFactory<IComponent> {
     /** @inheritdoc */
     public set Recursive(v: boolean) {
         this.#recursive = v;
+    }
+
+    /**
+     * Set the current recursive CSS class name assignment handling.
+     * @param v `true`, if nested components should be handled recursively, otherwise `false`.
+     * @returns This instance.
+     */
+    public recursive(v: boolean): this {
+        this.#recursive = v;
+        return this;
     }
 
     /**
@@ -264,8 +286,11 @@ export class CSSClassNameFactory extends ComponentFactory<IComponent> {
  * ```
  * Although calling `super.setupComponent()` in this implementation currently does nothing it's
  * nevertheless recommended.
+ *
+ * This class implements `IChildren` so that components can be added/removed/inserted directly to
+ * the application instance which will forward them to the root element/component.
  */
-export abstract class VTSApplication<EventMap extends EventMapVoid = HTMLElementEventMap> extends ComponentFactory<IComponent> {
+export abstract class VTSApplication<EventMap extends EventMapVoid = HTMLElementEventMap> extends ComponentFactory<IComponent> implements IChildren { // eslint-disable-line @typescript-eslint/no-unsafe-declaration-merging
     /**
      * The root DOM container element for all components to be added.
      */
@@ -286,10 +311,14 @@ export abstract class VTSApplication<EventMap extends EventMapVoid = HTMLElement
             ? rootElement
             : this.rootElement = document.body;
         this.root = new WrappedDOMElementComponentWithChildren(this.rootElement);
+        this.setChildrenDOMTarget(this.rootElement);
     }
 
     /**
-     * Get the root container component.
+     * Get the root container component.\
+     * __Note:__ This property __must not be used to add/remove/... components__, instead use the
+     * respective functions of `VTSApplication` itself! `Root` should only be used for styling or
+     * other (readonly) purposes!
      */
     public get Root(): IElementWithChildrenComponent<HTMLElementWithChildren, EventMap> {
         return this.root;
@@ -302,77 +331,23 @@ export abstract class VTSApplication<EventMap extends EventMapVoid = HTMLElement
         return this.rootElement;
     }
 
-    /**
-     * Get child components of this app. Also available on `Root`, re-exported here for
-     * convenience.\
-     * __Note:__ The returned array includes _all_ children based on a node _or_ element.
-     * @returns The array containing the child components of this component.
-     */
-    public get Children(): INodeComponent<Node>[] {
-        return this.root.Children;
-    }
-
-    /**
-     * Append child components. Also available on `Root`, re-exported here for convenience.
-     * @param components The components to append.
-     * @returns This instance.
-     */
-    public append(...components: (INodeComponent<Node> | undefined | null)[]): this {
-        this.root.append(...components);
+    /** @inheritdoc */
+    protected clearOwner(): this {
+        // __Note:__ It is assumed that the root element has no other real components attached to it
+        // (its just a wrapped DOM element) so `this.root.clear()` is not called here. This also
+        // ensures, that other pure DOM child elements of `this.rootElement` are not removed. If a
+        // different behavior is need, this has to implemented in a derived class in `clearOwner()`.
         return this;
     }
 
-    /**
-     * Append the children (components) of a fragment to this component. Also available on `Root`,
-     * re-exported here for convenience.
-     * @param fragment The fragment with components to append.
-     * @returns This instance.
-     */
-    public appendFragment(fragment: IFragment): this {
-        this.root.appendFragment(fragment);
-        return this;
-    }
-
-    /**
-     * Insert child components at a numeric index or the index of a component reference of this
-     * app. Also available on `Root`, re-exported here for convenience.
-     * @param at The target index in the collection of `Children`. If `at` is lower than 0 it is
-     * considered to be 0. If `at` is greater than `Children.length` the given components will be
-     * appended. If `at` is a component the components will be inserted at the position of `at`
-     * within the `Children` of this app. If `at` is not a child of this apps children,
-     * nothing will be inserted.
-     * @param components The components to insert.
-     * @returns This instance.
-     */
-    public insert(at: number | INodeComponent<Node>, ...components: (INodeComponent<Node> | undefined | null)[]): this {
-        this.root.insert(at, ...components);
-        return this;
-    }
-
-    /**
-     * Remove child components from this the app. Also available on `Root`, re-exported here for
-     * convenience.
-     * @param components The components to remove.
-     * @returns This instance.
-     */
-    public remove(...components: (INodeComponent<Node> | undefined | null)[]): this {
-        this.root.remove(...components);
-        return this;
-    }
-
-    /**
-     * Extract child components from this the app. If the length of `...components` is `0` *all*
-     * children of this component will be extracted and pushed to `to`. Also available on `Root`,
-     * re-exported here for convenience.
-     * @param to An array to which the removed components will be pushed.
-     * @param components The components to be extracted.
-     * @returns This instance.
-     */
-    public extract(to: INodeComponent<Node>[], ...components: (INodeComponent<Node> | undefined | null)[]): this {
-        this.root.extract(to, ...components);
-        return this;
+    static {
+        /** Mixin the IChildren implementation (which targets the `this.rootElement`). */
+        mixin(false, this, AChildren);
     }
 }
+
+// Augment class definition with `IChildren` (see `static`).
+export interface VTSApplication<EventMap extends EventMapVoid = HTMLElementEventMap> extends ComponentFactory<IComponent>, AChildren<HTMLElement, EventMap> { } // eslint-disable-line jsdoc/require-jsdoc
 
 /**
  * A class that serves as the root for an application which is appended to an existing DOM element.
@@ -404,9 +379,7 @@ export abstract class VTSApplication<EventMap extends EventMapVoid = HTMLElement
  * ```
  */
 export class VTS_App<EventMap extends EventMapVoid = HTMLElementEventMap> extends VTSApplication<EventMap> {
-    #cf: ComponentFactory<IComponent>;
-    #cssPrefix: string;
-    #recursive: boolean;
+    #cf: CSSClassNameFactory;
 
     /**
      * Build an app within the given root element.
@@ -417,23 +390,50 @@ export class VTS_App<EventMap extends EventMapVoid = HTMLElementEventMap> extend
      */
     constructor(rootElement?: HTMLElementWithChildren, cssPrefix: string = "vts", recursive: boolean = false) {
         super(rootElement);
-        this.#cssPrefix = cssPrefix;
-        this.#recursive = recursive;
-        this.#cf = new CSSClassNameFactory(this.#cssPrefix, this.#recursive);
+        this.#cf = new CSSClassNameFactory(cssPrefix, recursive);
     }
 
     /**
-     * Get CSS prefix used to setup components obtained by factory methods.
+     * Get/set the CSS prefix used to setup components obtained by factory methods.
      */
     public get CSSPrefix(): string {
-        return this.#cssPrefix;
+        return this.#cf.CSSPrefix;
+    }
+    /** @inheritdoc */
+    public set CSSPrefix(v: string) {
+        this.#cf.cssPrefix(v);
     }
 
     /**
-     * Get `Recursive` flag used to setup components obtained by factory methods.
+     * Set the current prefix used to setup components obtained by factory methods.
+     * @param v The current prefix for CSS class names.
+     * @returns This instance.
+     */
+    public cssPrefix(v: string): this {
+        this.#cf.cssPrefix(v);
+        return this;
+    }
+
+    /**
+     * Get/set the `Recursive` flag used to setup components obtained by factory methods.
      */
     public get Recursive(): boolean {
-        return this.#recursive;
+        return this.#cf.Recursive;
+    }
+    /** @inheritdoc */
+    public set Recursive(v: boolean) {
+        this.#cf.recursive(v);
+    }
+
+    /**
+     * Set the current recursive CSS class name assignment handling which is used to setup
+     * components obtained by factory methods.
+     * @param v `true`, if nested components should be handled recursively, otherwise `false`.
+     * @returns This instance.
+     */
+    public recursive(v: boolean): this {
+        this.#cf.recursive(v);
+        return this;
     }
 
     /** @inheritdoc */
