@@ -6,7 +6,8 @@ import {
 import {
     AnyType,
     Constructor,
-    Ctor
+    Ctor,
+    HTMLElementWithDisabled
 } from "./Types.js";
 
 
@@ -243,6 +244,76 @@ export const ModifierKeys = (() => {
         /* eslint-enable */
     }>;
 })();
+
+/**
+ * CSS selector that selects all tabbable elements.\
+ * __Important note:__ This selection is most likely very incomplete. It does not guarantee that the
+ * selected elements are actually tabbable, it only selects elements that _potentially could be_
+ * tabbable.
+ */
+const tabbableElementsSelector = [
+    "button:not([tabindex='-1'])",
+    "input:not([tabindex='-1'])",
+    "select:not([tabindex='-1'])",
+    "textarea:not([tabindex='-1'])",
+    "details:not([tabindex='-1'])",
+    "area:not([tabindex='-1'])",
+    "a:not([tabindex='-1'])",
+    "form:not([tabindex='-1'])",
+    "[href]:not([tabindex='-1'])",
+    "[contenteditable]",
+    "[tabindex]:not([tabindex='-1'])"
+].join(", ");
+
+/**
+ * Implements a tab key cycle within a given HTML element. This means that when the tab key is
+ * pressed within `elem` and the currently active element is the last tabbable element within
+ * `elem`, the focus will be set to the first tabbable element within `elem`. If the shift key is
+ * pressed together with the tab key and the currently focused element is the first tabbable
+ * element within `elem`, the focus will be set to the last tabbable element within `elem`.\
+ * __Important note:__ This implementation is most likely very incomplete. It only handles some
+ * basic cases. A complete implementation of tabbable elements would be much more complex. It can
+ * also take some time to find all tabbable elements within `elem`, especially if the selector
+ * returns many elements. Therefore, this function should only be used in sub sections of an app
+ * like in a dialog or in panels which require tab key trapping.
+ * @param elem The HTML element within which the tab key cycle is to be applied.
+ * @param ev The keyboard event that triggered the tab key cycle.
+ * @param preventPropagation If `true`, the event propagation will be stopped when the tab key cycle
+ * is applied. Default: `true`.
+ * @param selector A CSS selector that selects all tabbable elements within `elem`.\
+ * Default: See {@link tabbableElementsSelector}.
+ * @see https://allyjs.io/data-tables/focusable.html#editable-elements
+ * @see https://allyjs.io/api/is/tabbable.html
+ * @todo Improve the implementation to cover more cases of tabbable elements.
+ */
+export function tabKeyFocusCycle(elem: HTMLElement, ev: KeyboardEvent, preventPropagation: boolean = true, selector: string = tabbableElementsSelector): void {
+    const tabbableElements = Array.from(elem.querySelectorAll(selector))
+        .filter(e => {
+            return e instanceof HTMLElement
+                && !e.classList.contains("disabled")
+                && !(<HTMLElementWithDisabled>e).disabled
+                && !e.hidden
+                && !e.inert
+                && e.style.display !== "none"
+                && e.style.visibility !== "hidden"
+                && (e.hasAttribute("contenteditable") ? ["", "true"].includes(e.contentEditable.trim().toLowerCase()) : true);
+        });
+    const firstTabbableElement = <HTMLElement>tabbableElements[0];
+    const lastTabbableElement = <HTMLElement>tabbableElements[tabbableElements.length - 1];
+    if (ev.shiftKey) {
+        if (!firstTabbableElement || ev.target === firstTabbableElement) {
+            ev.preventDefault();
+            preventPropagation && ev.stopImmediatePropagation();
+            lastTabbableElement?.focus?.();
+        }
+    } else {
+        if (!lastTabbableElement || ev.target === lastTabbableElement) {
+            ev.preventDefault();
+            preventPropagation && ev.stopImmediatePropagation();
+            firstTabbableElement?.focus?.();
+        }
+    }
+}
 
 /**
  * Converts a string to a kebap case string.
