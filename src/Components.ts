@@ -130,27 +130,27 @@ export class FragmentComponent extends AFragmentComponent {
  * @see {@link AComponentFactory}
  * @example
  * ```typescript
- * class MyFactory extends VTSComponentFactory<IComponent> {
- *   public override setupComponent(component: IVTElementComponent): IIsElementComponent {
- *     const className = component
- *       .ClassName
- *       .replace(/[A-Z]+(?![a-z])|[A-Z]/g, (c, o) => (o ? "-" : "") + c.toLowerCase());
- *     return component.addClass(`vts-${className}`);
- *   }
+ * class MyFactory extends ComponentFactory<IComponent> {
+ *     public override setupComponent(component: IElementComponent<HTMLElement>): IComponent {
+ *         const className = component
+ *             .ClassName
+ *             .replace(/[A-Z]+(?![a-z])|[A-Z]/g, (c, o) => (o ? "-" : "") + c.toLowerCase());
+ *         return component.addClass(`vts-${className}`);
+ *     }
  * }
  *
- * const $ = new (Mixin(
- *   MyFactory,
- *   DivFactory, ButtonFactory, LabeledTextInputFactory
+ * const $ = new (mixinComponentFactories(
+ *     MyFactory,
+ *     DivFactory, ButtonFactory, LabeledTextInputFactory
  * ));
  *
  * let edtUserName: LabeledTextInput;
  *
  * const app = $.div().addClass("app").append(
- *   edtUserName = $.labeledTextInput("Username:", "userName", "userName"),
- *   $.button("Create").on("click", (_ev: MouseEvent) => {
- *     Store.createUser(edtUserName.Input.Value);
- *   })
+ *     edtUserName = $.labeledTextInput("Username:", "userName", "userName"),
+ *     $.button("Create").on("click", (_ev: MouseEvent) => {
+ *         Store.createUser(edtUserName.Component.Value);
+ *     })
  * );
  * ```
  *
@@ -158,13 +158,13 @@ export class FragmentComponent extends AFragmentComponent {
  *
  * ```typescript
  * const app = $.div().addClass("app").append(
- *   ...(() => {
- *     const edt = $.labeledTextInput("Username:", "userName", "userName");
- *     const btn = $.button("Create").on("click", (_ev: MouseEvent) => {
- *       Store.createUser(input.Input.Value);
- *     });
- *     return [edt, btn];
- *   })()
+ *     ...(() => {
+ *         const edt = $.labeledTextInput("Username:", "userName", "userName");
+ *         const btn = $.button("Create").on("click", (_ev: MouseEvent) => {
+ *             Store.createUser(edt.Component.Value);
+ *         });
+ *         return [edt, btn];
+ *     })()
  * );
  * ```
  */
@@ -303,7 +303,9 @@ export abstract class VTSApplication<EventMap extends EventMapVoid = HTMLElement
     }
 
     /**
-     * Get child components of this app. Also available on `Root`, re-exported here for convenience.
+     * Get child components of this app. Also available on `Root`, re-exported here for
+     * convenience.\
+     * __Note:__ The returned array includes _all_ children based on a node _or_ element.
      * @returns The array containing the child components of this component.
      */
     public get Children(): INodeComponent<Node>[] {
@@ -384,12 +386,12 @@ export abstract class VTSApplication<EventMap extends EventMapVoid = HTMLElement
  * const MyAppClass = mixinComponentFactories(
  *     VTS_App,
  *     DivFactory,
- *     H1Factory,
+ *     HxFactory,
  *     PFactory,
  *     ButtonFactory
  * );
  *
- * export const _ = new MyAppClass(document.getElementById("app"), "vts", true);
+ * export const _ = new MyAppClass(document.getElementById("app")!, "vts", true);
  *
  * _.append(
  *     _.div().append(
@@ -398,7 +400,7 @@ export abstract class VTSApplication<EventMap extends EventMapVoid = HTMLElement
  *         _.button("Click me!")
  *             .on("click", () => alert("Thank you!")),
  *     )
- * )
+ * );
  * ```
  */
 export class VTS_App<EventMap extends EventMapVoid = HTMLElementEventMap> extends VTSApplication<EventMap> {

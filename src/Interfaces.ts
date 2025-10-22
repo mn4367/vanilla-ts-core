@@ -376,14 +376,14 @@ export interface IGlobalDOMAttributes {
  */
 export interface IChildren {
     /**
-     * The child components of this component, includes all children based on a node or element.\
+     * The child components of this component, includes all children based on a node _or_ element.\
      * __Note:__ This must be a _copy_ of the (presumably internal) list of children to avoid
      * manipulation by the recipient.
      */
     readonly Children: INodeComponent<Node>[];
 
     /**
-     * The child components of this component, includes only children based on an element.\
+     * The child components of this component, _only_ includes children based on an element.\
      * __Note:__ This must be a _copy_ of the (presumably internal) list of element children to
      * avoid manipulation by the recipient.
      */
