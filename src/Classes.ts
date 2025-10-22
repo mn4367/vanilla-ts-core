@@ -1628,7 +1628,7 @@ export interface AElementComponentWithChildren<T extends HTMLElementWithChildren
  * }
  * ```
  */
-export abstract class AElementComponentWithInternalUI<UI extends IElementWithChildrenComponent<HTMLElementWithChildren>, EventMap extends EventMapVoid = HTMLElementEventMap> extends AElementComponent<HTMLElement, EventMap> {
+export abstract class AElementComponentWithInternalUI<UI extends (IElementComponent<HTMLElement> & IChildren), EventMap extends EventMapVoid = HTMLElementEventMap> extends AElementComponent<HTMLElement, EventMap> {
     /** The container which constitutes the component tree/user interface of the component. */
     protected ui: UI;
     #mountUI: boolean;
@@ -1752,9 +1752,9 @@ export abstract class AElementComponentWithInternalUI<UI extends IElementWithChi
         this.#mountUI = mountUI;
         this.buildUI(...args); // eslint-disable-line @typescript-eslint/no-unsafe-argument
         if (this.#mountUI) {
-            this.ui.onBeforeMount(<UI><unknown>this);
+            this.ui.onBeforeMount(<IElementWithChildrenComponent<HTMLElement>><unknown>this);
             this._dom = this.ui.DOM;
-            this.ui.onDidMount(<UI><unknown>this);
+            this.ui.onDidMount(<IElementWithChildrenComponent<HTMLElement>><unknown>this);
         } else {
             this._dom = this.ui.DOM;
         }
