@@ -1723,8 +1723,8 @@ export abstract class AElementComponentWithInternalUI<UI extends (IElementCompon
     /**
      * Builds the internal component tree/user interface of the component. Has to be implemented
      * by classes that extend `AElementComponentWithInternalUI`. Will automatically be called by
-     * `init()` and _must never_ be called directly in derived classes.
-     * @param args An array of arguments which will be passed by `initialized()` to `buildUI()`.
+     * `initialize()` and _must never_ be called directly in derived classes.
+     * @param args An array of arguments which will be passed by `initialize()` to `buildUI()`.
      * @returns This instance.
      */
     protected abstract buildUI(...args: AnyType[]): this;
@@ -1746,7 +1746,7 @@ export abstract class AElementComponentWithInternalUI<UI extends (IElementCompon
      */
     protected initialize(mountUI: boolean = true, ...args: Parameters<typeof this.buildUI>): this {
         if (this.#initialized) {
-            throw new Error("'init()' can only be called once.");
+            throw new Error("'initialize()' can only be called once.");
         }
         this.#initialized = true;
         this.#mountUI = mountUI;
@@ -1758,6 +1758,17 @@ export abstract class AElementComponentWithInternalUI<UI extends (IElementCompon
         } else {
             this._dom = this.ui.DOM;
         }
+        return this.initialized();
+    }
+
+    /**
+     * This function is called after `initialize()` and `buildUI()` have been called. At this point
+     * the basic internal structure and the tree of the component are completely set up and mounted
+     * (from the perspective of `AElementComponentWithInternalUI`). The default implementation here
+     * does nothing, it can be overridden in derived classes to perform additional operations.
+     * @returns This instance.
+     */
+    protected initialized(): this {
         return this;
     }
 
