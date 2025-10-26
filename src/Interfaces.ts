@@ -2,7 +2,7 @@ import {
     AnyType,
     AutoCapitalizeAttrValues,
     ContentEditableAttrValues,
-    CSSRuleNames,
+    CSSPropertyNames,
     DirAttrValues,
     EnterKeyHintAttrValues,
     HTMLElementVoid,
@@ -1112,18 +1112,29 @@ export interface IElementComponent<T extends HTMLElement, EventMap extends Event
     hidden(hidden: boolean): this;
 
     /**
-     * Get/set style rule value of the underlying HTML element.
+     * Get the style declaration of the underlying HTML element.
      */
     Style: CSSStyleDeclaration;
 
     /**
-     * Set style rule value on the underlying HTML element.
-     * @param ruleName The CSS style rule name (camelCase name e.g. `backgroundColor`).
-     * @param value The style value to be set. If `value` is `null`, the style rule will be removed
-     * from the underlying HTML element. In this case `important` is ignored.
-     * @param important If true, the style priority will be set to `!important`.
+     * Set style property value(s) on the underlying HTML element.
+     * @param property The style property name (_camelCase_ name e.g. `backgroundColor`) or an
+     * object containing multiple style property names and their values. In case of an object, each
+     * key is a style property name (also in _camelCase_) and the corresponding value is the value
+     * to be set for this property. A value of `null` or `undefined` for a property will remove this
+     * property from the underlying HTML element. If a value ends with `!` the priority of the
+     * property will be set to `important`.
+     * @param value The value to be set for the style property.
+     * - If `property` is a string `value` is the value to be set for this property. If `value` is
+     *   `null` or `undefined` or not given, the style property will be removed from the underlying
+     *   HTML element. In this case `important` is ignored.
+     * - If `property` is an object `value` is ignored.
+     * @param important Sets the priority of the style property.
+     * - If `property` is a string and `important` is `true`, the style priority will be set to
+     *   `important`.
+     * - If `property` is an object `important` is ignored.
      */
-    style(ruleName: CSSRuleNames, value: NullableString, important?: boolean): this;
+    style(property: CSSPropertyNames | { [key in CSSPropertyNames]?: string }, value?: NullableString | undefined, important?: boolean): this;
 
     /**
      * Sets the focus to the DOM element of this component.\

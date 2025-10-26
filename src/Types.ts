@@ -355,9 +355,9 @@ export const DEFAULT_EVENT_INIT_DICT = { bubbles: true, cancelable: false, compo
 export const DEFAULT_CANCELABLE_EVENT_INIT_DICT = { bubbles: true, cancelable: true, composed: true }; // eslint-disable-line jsdoc/require-jsdoc
 
 /**
- * Names of CSS style rules.
+ * Names of CSS style properties.
  */
-export type CSSRuleNames = keyof Omit<
+export type CSSPropertyNames = keyof Omit<
     CSSStyleDeclaration,
     number |
     typeof Symbol.iterator |

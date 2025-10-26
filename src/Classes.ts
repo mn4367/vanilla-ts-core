@@ -24,7 +24,7 @@ import {
     AutoCapitalizeAttrValues,
     Constructor,
     ContentEditableAttrValues,
-    CSSRuleNames,
+    CSSPropertyNames,
     DEFAULT_EVENT_INIT_DICT,
     DirAttrValues,
     EnterKeyHintAttrValues,
@@ -997,10 +997,22 @@ export abstract class AElementComponent<T extends (HTMLElementWithChildren | HTM
     }
 
     /** @inheritdoc */
-    public style(ruleName: CSSRuleNames, value: NullableString, important?: boolean): this {
-        value === null
-            ? this._dom.style.removeProperty(toKebapCase(ruleName))
-            : this._dom.style.setProperty(toKebapCase(ruleName), value, important ? "important" : undefined);
+    public style(property: CSSPropertyNames | { [key in CSSPropertyNames]?: NullableString | undefined }, v?: NullableString, important?: boolean): this {
+        if (typeof property === "string") {
+            v
+                ? this._dom.style.setProperty(toKebapCase(property), v, important ? "important" : undefined)
+                : this._dom.style.removeProperty(toKebapCase(property));
+            return this;
+        }
+        for (const prop in property) {
+            const v = (property[prop as CSSPropertyNames] ?? "").trimEnd();
+            if (v === "") {
+                this._dom.style.removeProperty(toKebapCase(prop));
+            } else {
+                const important = v.endsWith("!");
+                this._dom.style.setProperty(toKebapCase(prop), important ? v.slice(0, -1) : v, important ? "important" : undefined);
+            }
+        }
         return this;
     }
 
