@@ -259,6 +259,8 @@ const tabbableElementsSelector = [
     "details:not([tabindex='-1'])",
     "area:not([tabindex='-1'])",
     "a:not([tabindex='-1'])",
+    "audio[controls]:not([tabindex='-1'])",
+    "video[controls]:not([tabindex='-1'])",
     "form:not([tabindex='-1'])",
     "[href]:not([tabindex='-1'])",
     "[contenteditable]",

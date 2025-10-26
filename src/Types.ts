@@ -230,6 +230,11 @@ export type HTMLElementWithHref = HTMLAnchorElement | HTMLAreaElement | HTMLBase
 export type HTMLElementWithHreflang = HTMLAnchorElement | HTMLLinkElement;
 
 /**
+ * HTML elements which can have a `label` attribute.
+ */
+export type HTMLElementWithLabel = HTMLOptGroupElement | HTMLOptionElement | HTMLTrackElement;
+
+/**
  * HTML elements which can have a `loading` attribute.
  */
 export type HTMLElementWithLoading = HTMLImageElement | HTMLIFrameElement;

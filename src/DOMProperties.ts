@@ -4,7 +4,13 @@ import {
     AElementComponent
 } from "./Classes.js";
 import {
-    INodeComponent
+    ComponentFactory,
+    ElementComponentWithChildren
+} from "./Components.js";
+import {
+    INodeComponent,
+    Phrase,
+    Phrases
 } from "./Interfaces.js";
 import {
     HTMLElementWithAlt,
@@ -14,6 +20,7 @@ import {
     HTMLElementWithDownload,
     HTMLElementWithHref,
     HTMLElementWithHreflang,
+    HTMLElementWithLabel,
     HTMLElementWithLoading,
     HTMLElementWithMultiple,
     HTMLElementWithName,
@@ -33,21 +40,27 @@ import {
     NullableNumber,
     NullableString
 } from "./Types.js";
+import {
+    mixinDOMProperties
+} from "./Utils.js";
 
 
 /**
  * This file contains various abstract classes that have default implementations of DOM attributes
  * and properties that are used in some DOM components. These attributes/properties are added as
- * mixins to some DOM components to avoid repeating the code in the components themselves.\
+ * mixins to some DOM components to avoid repeating the code in the components themselves.
+ *
  * To prevent circular dependencies and reference/initialization errors due to module
- * loading/execution these classes must not be used from classes in this project!
- * @todo Extend with more DOM attributes/properties.
+ * loading/execution these classes must not be used from classes in this project! The only exception
+ * to this rule is currently the {@link Option} component (in this module) which is used by the
+ * {@link DataListAttr} DOM property class.
+ * ---
+ * @todo Extend with more DOM attributes/properties/utility DOM components.
  */
 
 
 /////////////////////////////
 // #region Attributes
-
 /**
  * 'Alt' getter/setter and set method returning this instance.
  */
@@ -109,7 +122,6 @@ export abstract class AutocompleteAttr<T extends HTMLElementWithAutocomplete, Ev
         return this;
     }
 }
-
 
 /**
  * Custom 'checked' event for checkboxes and radio buttons. Like `change` and `input` this event is
@@ -451,6 +463,39 @@ export abstract class PingAttr<T extends HTMLElementWithPing, EventMap extends H
      */
     public ping(...v: string[]): this {
         this.attrib("loading", v.length === 0 ? null : v.join(" "));
+        return this;
+    }
+}
+
+/**
+ * 'Label' getter/setter and set method returning this instance.
+ */
+export abstract class LabelAttr<T extends HTMLElementWithLabel, EventMap extends HTMLElementEventMap = HTMLElementEventMap> extends AElementComponent<T, EventMap> {
+    /**
+     * Get/set the `label` attribute value of the component. `null` or an empty string removes the
+     * attribute.
+     * @see https://developer.mozilla.org/en-US/docs/Web/HTML/Element/option#label
+     * @see https://developer.mozilla.org/en-US/docs/Web/HTML/Element/optgroup#label
+     * @see https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/track#label
+     */
+    public get Label(): string {
+        return this._dom.label;
+    }
+    /** @inheritdoc */
+    public set Label(v: NullableString) {
+        this.label(v);
+    }
+
+    /**
+     * Set `label` attribute value of the component.
+     * @param v The value to be set. `null` or an empty string removes the attribute.
+     * @see https://developer.mozilla.org/en-US/docs/Web/HTML/Element/option#label
+     * @see https://developer.mozilla.org/en-US/docs/Web/HTML/Element/optgroup#label
+     * @see https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/track#label
+     * @returns This instance.
+     */
+    public label(v: NullableString): this {
+        this.attrib("label", v);
         return this;
     }
 }
@@ -1198,4 +1243,89 @@ export abstract class SelectionEndProp<T extends HTMLInputElement | HTMLTextArea
     }
 }
 // #endregion Properties
+/////////////////////////////
+
+
+/////////////////////////////
+// #region Utility DOM components
+/**
+ * Option component (`<option>`).\
+ * __Note:__ This class is part of `@vanilla-ts/core` and not of `@vanilla-ts/dom` because it is
+ * used in the {@link DataListAttr} DOM property (to avoid cyclic package dependencies).
+ */
+export class Option<EventMap extends HTMLElementEventMap = HTMLElementEventMap> extends ElementComponentWithChildren<HTMLOptionElement, EventMap> { // eslint-disable-line @typescript-eslint/no-unsafe-declaration-merging
+    /**
+     * Create Option component.
+     * @param phrase The phrasing content for the `<option>` element. Due to the limited styling
+     * capabilities of <option> elements, it is strongly recommended to use a text string text only.
+     */
+    constructor(...phrase: Phrases) {
+        super("option");
+        phrase.length > 0 && this.phrase(...phrase);
+    }
+
+    /**
+     * Get/set the `selected` attribute value of the component.
+     * @see https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/option#selected
+     */
+    public get Selecetd(): boolean {
+        return this._dom.selected;
+    }
+    /** @inheritdoc */
+    public set Selecetd(v: boolean) {
+        this._dom.selected = v;
+    }
+
+    /**
+     * Set `selected` attribute value of the component.
+     * @param v The value to be set.
+     * @see https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/option#selected
+     * @returns This instance.
+     */
+    public selected(v: boolean): this {
+        this._dom.selected = v;
+        return this;
+    }
+
+    static {
+        /** Mixin additional DOM attributes/properties. */
+        mixinDOMProperties(
+            this,
+            LabelAttr<HTMLOptionElement>,
+            NativeDisabledAttr<HTMLOptionElement>,
+            ValueAttr<HTMLOptionElement>
+        );
+    }
+}
+
+// Augment class definition with the DOM attributes/properties introduced by `mixinDOMProperties()`
+// above.
+export interface Option<EventMap extends HTMLElementEventMap = HTMLElementEventMap> extends // eslint-disable-line jsdoc/require-jsdoc
+    LabelAttr<HTMLOptionElement, EventMap>,
+    ValueAttr<HTMLOptionElement, EventMap>,
+    NativeDisabledAttr<HTMLOptionElement, EventMap> { }
+
+/**
+ * Factory for `Option` components.
+ */
+export class OptionFactory<T> extends ComponentFactory<Option> {
+    /**
+     * Create Option component.
+     * @param phrase The phrasing content for the `<option>` element. Due to the limited styling
+     * capabilities of <option> elements, it is strongly recommended to use a text string text only.
+     * @param data Optional arbitrary data passed to the `setupComponent()` function of the factory.
+     * @returns Header component.
+     */
+    public option(phrase?: Phrase | Phrases, data?: T): Option {
+        return this.setupComponent(
+            !phrase
+                ? new Option()
+                : Array.isArray(phrase)
+                    ? new Option(...phrase)
+                    : new Option(phrase),
+            data
+        );
+    }
+}
+// #endregion Utility DOM components
 /////////////////////////////
