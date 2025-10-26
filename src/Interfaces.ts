@@ -1112,6 +1112,28 @@ export interface IElementComponent<T extends HTMLElement, EventMap extends Event
     hidden(hidden: boolean): this;
 
     /**
+     * Get/set tabbability of the underlying HTML element.
+     * @see {@link tabbable()}
+     */
+    Tabbable: boolean;
+
+    /**
+     * Enable/disable tabbability of the underlying HTML element.\
+     * __Notes:__
+     * - Enabling/disabling tabbability depends on the type of the underlying HTML element.
+     * - For 'native' tabbable elements (like e.g. `<button>`, `<input>`, `<select>`, etc.)
+     *   disabling tabbability will add `tabindex="-1"` to the element, enabling tabbability will
+     *   remove the `tabindex` attribute so that the natural tabbing behavior of the element is
+     *   restored.
+     * - For non-tabbable elements (like e.g. `<div>`, `<span>`, `<p>`, etc.) enabling tabbability
+     *   will add `tabindex="0"` to the element (but only, if `tabindex` isn't already `0` or
+     *   greater).
+     * @param tabbable `true` if the element can be tabbed to, otherwise `false`.
+     * @returns This instance.
+     */
+    tabbable(tabbable: boolean): this;
+
+    /**
      * Get the style declaration of the underlying HTML element.
      */
     Style: CSSStyleDeclaration;

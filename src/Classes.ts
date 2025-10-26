@@ -30,6 +30,7 @@ import {
     EnterKeyHintAttrValues,
     HTMLElementVoid,
     HTMLElementWithChildren,
+    HTMLTagsWithNativeTabbing,
     InputModeAttrValues,
     NullableBoolean,
     NullableNumber,
@@ -987,6 +988,30 @@ export abstract class AElementComponent<T extends (HTMLElementWithChildren | HTM
                 this._dom.style.visibility = this.prevStyleVisibility;
                 this._dom.removeAttribute("data-c-hidden");
             }
+        }
+        return this;
+    }
+
+    /** @inheritdoc */
+    public get Tabbable(): boolean {
+        return this._dom.tabIndex >= 0;
+    }
+    /** @inheritdoc */
+    public set Tabbable(v: boolean) {
+        this.tabbable(v);
+    }
+
+    /** @inheritdoc */
+    public tabbable(tabbable: boolean): this {
+        if (tabbable) {
+            this._dom.tabIndex < 0 &&
+                (HTMLTagsWithNativeTabbing.includes(this._dom.tagName)
+                    ? this.attrib("tabindex", null)
+                    : this._dom.tabIndex = 0);
+        } else {
+            HTMLTagsWithNativeTabbing.includes(this._dom.tagName)
+                ? this._dom.tabIndex = -1
+                : this.attrib("tabindex", null);
         }
         return this;
     }

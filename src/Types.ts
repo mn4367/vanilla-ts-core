@@ -131,6 +131,20 @@ export const HTMLTagsWithNativeDisabled: Array<string> = [
 ] as const;
 
 /**
+ * HTML elements which can be tabbed to by default.
+ * @todo Verify this list.
+ */
+export const HTMLTagsWithNativeTabbing: Array<string> = [
+    "A",
+    "AREA",
+    "BUTTON",
+    "INPUT",
+    "OBJECT",
+    "SELECT",
+    "TEXTAREA"
+] as const;
+
+/**
  * HTML elements which can have a `name` attribute.
  */
 export type HTMLElementWithName =
