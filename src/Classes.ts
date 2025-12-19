@@ -2088,7 +2088,7 @@ export abstract class ACustomComponentEvent<T extends string, S extends INodeCom
  * AppEventBus.emit(...)
  * AppEventBus.suspend(...)
  * AppEventBus.resume(...)
- * AppEventBus.allEvents()
+ * AppEventBus.allEvents(...)
  *
  *
  * // -- File `AppShutdown.ts` --

@@ -222,8 +222,10 @@ type ScriptFileOptions = {
     UseNodeResolve?: boolean;
     /**
      * Include all imported Node module files. If `false`, module filenames that contain the string
-     * `node_modules` will be discarded from the output.\
-     * Default: `false`.
+     * `node_modules` will be discarded from the output. The default is true since in most cases
+     * DOM components from `@vanilla-ts/dom` will be imported and used by `@vanilla-ts/components`
+     * which have a corresponding CSS file there (like `Checkbox`).\
+     * Default: `true`.
      */
     IncludeNodeModules?: boolean;
     /**
@@ -238,15 +240,10 @@ type ScriptFileOptions = {
     UseJSON?: boolean;
     /**
      * Additional options for _Rollup_.\
-     * Default: `{ external: ["@vanilla-ts/core", "@vanilla-ts/dom"] }`.\
-     * __Note:__ The default exclusion of the modules `@vanilla-ts/core` and `@vanilla-ts/dom` here
-     * is done to prevent the duplicate inclusion of CSS files with common names like `Dialog.css`.
-     * If, for example, an application uses the `Dialog.js` module from `@vanilla-ts/components` the
-     * content of the file `Dialog.css` would appear twice in the generated output since the module
-     * `Dialog.js` from `@vanilla-ts/components` has a dependency to the module `Dialog.js` from
-     * `@vanilla-ts/dom` so there would be two imported files named `Dialog.js` which causes this
-     * behaviour. In general neither `@vanilla-ts/core` nor `@vanilla-ts/dom` have CSS files, so
-     * by default they can always be excluded.
+     * Default: `{ external: ["@vanilla-ts/core" }`.\
+     * __Note:__ `@vanilla-ts/core` is excluded by default because it will never contain CSS files.
+     * Usually `external` should also contain direct dependencies of `SourceFile`/the application
+     * which do not not contain needed CSS files.
      */
     RollupOptions?: RollupOptions;
     /**
@@ -435,10 +432,10 @@ export async function concatCSS(options: ConcatCSSOptions): Promise<string[]> {
                 Lookup: { Pattern: e.Lookup?.Pattern ?? "", GlobOptions: e.Lookup?.GlobOptions ?? {} },
                 FileExtensions: e.FileExtensions ? [...e.FileExtensions] : [".css"],
                 UseNodeResolve: e.UseNodeResolve ?? true,
-                IncludeNodeModules: e.IncludeNodeModules ?? false,
+                IncludeNodeModules: e.IncludeNodeModules ?? true,
                 UseCommonJS: e.UseCommonJS ?? false,
                 UseJSON: e.UseJSON ?? false,
-                RollupOptions: e.RollupOptions ? { ...e.RollupOptions } : { external: ["@vanilla-ts/dom", "@vanilla-ts/core"] },
+                RollupOptions: e.RollupOptions ? { ...e.RollupOptions } : { external: ["@vanilla-ts/core"] },
                 Debug: e.Debug ? { ...e.Debug } : { Modules: false, Ignored: false, Used: false, Warnings: false },
                 Header: e.Header ?? "region",
                 Footer: e.Footer ?? "end-region",

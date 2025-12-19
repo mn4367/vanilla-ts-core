@@ -395,6 +395,7 @@ interface IDebouncedFunction<F extends (...args: AnyType) => AnyType> {
  *
  * Largely adopted (and expanded) from:
  * @see https://github.com/Bwca/np__merry-solutions__debounce
+ *
  * The following example displays `bar` and `rab` on the console almost immediately and again `bar`
  * after approx. 5 seconds.
  * @example
