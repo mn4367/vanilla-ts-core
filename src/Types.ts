@@ -386,3 +386,8 @@ export type CSSPropertyNames = keyof Omit<
     "getPropertyPriority" |
     "item"
 >;
+
+/**
+ * An object representing multiple CSS style declarations.
+ */
+export type CSSStyleDeclarations = { [key in CSSPropertyNames]?: NullableString | undefined };

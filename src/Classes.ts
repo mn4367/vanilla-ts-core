@@ -25,6 +25,7 @@ import {
     Constructor,
     ContentEditableAttrValues,
     CSSPropertyNames,
+    CSSStyleDeclarations,
     DEFAULT_EVENT_INIT_DICT,
     DirAttrValues,
     EnterKeyHintAttrValues,
@@ -1022,7 +1023,7 @@ export abstract class AElementComponent<T extends (HTMLElementWithChildren | HTM
     }
 
     /** @inheritdoc */
-    public style(property: CSSPropertyNames | { [key in CSSPropertyNames]?: NullableString | undefined }, v?: NullableString, important?: boolean): this {
+    public style(property: CSSPropertyNames | CSSStyleDeclarations, v?: NullableString, important?: boolean): this {
         if (typeof property === "string") {
             v
                 ? this._dom.style.setProperty(toKebapCase(property), v, important ? "important" : undefined)
