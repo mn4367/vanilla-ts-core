@@ -3,6 +3,7 @@ import {
     AutoCapitalizeAttrValues,
     ContentEditableAttrValues,
     CSSPropertyNames,
+    CSSStyleDeclarations,
     DirAttrValues,
     EnterKeyHintAttrValues,
     HTMLElementVoid,
@@ -1156,7 +1157,7 @@ export interface IElementComponent<T extends HTMLElement, EventMap extends Event
      *   `important`.
      * - If `property` is an object `important` is ignored.
      */
-    style(property: CSSPropertyNames | { [key in CSSPropertyNames]?: string }, value?: NullableString | undefined, important?: boolean): this;
+    style(property: CSSPropertyNames | CSSStyleDeclarations, value?: NullableString | undefined, important?: boolean): this;
 
     /**
      * Sets the focus to the DOM element of this component.\

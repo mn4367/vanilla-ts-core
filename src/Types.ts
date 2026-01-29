@@ -390,4 +390,4 @@ export type CSSPropertyNames = keyof Omit<
 /**
  * An object representing multiple CSS style declarations.
  */
-export type CSSStyleDeclarations = { [key in CSSPropertyNames]?: NullableString | undefined };
+export type CSSStyleDeclarations = { [key in CSSPropertyNames]?: NullableString };
