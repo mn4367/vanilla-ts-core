@@ -469,6 +469,19 @@ export const generateUUID: () => UUID =
         };
 
 /**
+ * A function that returns a string starting with `_` followed by six random alphanumeric
+ * characters. The intended use case is to create unique IDs for HTML elements. The characters are
+ * chosen out of the range `0` to `9` and `a` to `z` so a result could be `_j9e20f`. This function
+ * is also used internally for generating IDs for components where an ID is needed/recommended but
+ * not explicitly provided.
+ * @returns A string starting with `_` followed by six random alphanumeric characters.
+ */
+export const cid = (): string => {
+    return "_" + Math.floor(Math.random() * 2176782336 /* 36 ** 6 */).toString(36).padStart(6, "0");
+};
+
+
+/**
  * Checks if an object has a property with the value `undefined`.
  * @param obj The object to be checked.
  * @param prop The (name of the) property to be checked.
