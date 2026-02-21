@@ -955,12 +955,14 @@ export abstract class AElementComponent<T extends (HTMLElementWithChildren | HTM
             if (this._visible) {
                 this._dom.style.display = this.prevStyleDisplay;
                 this._dom.removeAttribute("data-c-invisible");
+                this._dom.removeAttribute("aria-hidden");
             } else {
                 this.prevStyleDisplay = this._dom.style.display;
                 this._dom.style.display = "none";
                 // Setting `data-invisible` is unbearably slow in WebKit? Therefore it's prefixed
                 // with `c-`.
                 this._dom.setAttribute("data-c-invisible", "");
+                this._dom.setAttribute("aria-hidden", "true");
             }
         }
         return this;
@@ -985,9 +987,11 @@ export abstract class AElementComponent<T extends (HTMLElementWithChildren | HTM
                 // Setting `data-hidden` shows no performance problems in WebKit but for consistency
                 // it's also prefixed with `c-` (see `visible()`).
                 this._dom.setAttribute("data-c-hidden", "");
+                this._dom.setAttribute("aria-hidden", "true");
             } else {
                 this._dom.style.visibility = this.prevStyleVisibility;
                 this._dom.removeAttribute("data-c-hidden");
+                this._dom.removeAttribute("aria-hidden");
             }
         }
         return this;
@@ -1642,7 +1646,7 @@ export interface AElementComponentWithChildren<T extends HTMLElementWithChildren
  *     super();
  *     // Never call `this.buildUI()` yourself since this is done by `initialize()` (which _must_
  *     // be called)!
- *     super.initialize();
+ *     this.initialize();
  *   }
  *
  *   protected override buildUI(): this {
