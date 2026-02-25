@@ -382,7 +382,7 @@ export abstract class ANodeComponent<T extends Node, EventMap extends EventMapVo
     public override dispose(): void {
         this.allEvents(ALL_EVENTS.OFF);
         this._dom?.parentNode?.removeChild(this._dom);
-        // @ts-ignore
+        // @ts-expect-error ---
         this._dom = undefined;
         super.dispose();
     }
@@ -396,7 +396,7 @@ export abstract class ANodeComponent<T extends Node, EventMap extends EventMapVo
         return Object.keys(listenerOptions)
             .sort()
             .reduce(function (sorted: AddEventListenerOptions, key: string) {
-                // @ts-ignore
+                // @ts-expect-error ---
                 // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
                 sorted[key] = listenerOptions[key];
                 return sorted;
@@ -441,9 +441,7 @@ export abstract class ANodeComponent<T extends Node, EventMap extends EventMapVo
             this._dom.removeEventListener(listener.Type, <EventListener>listener.Listener, listener.Options); // eslint-disable-line @typescript-eslint/unbound-method
         }
         for (const listener of this.eventListeners) {
-            listener.Suspended
-                ? undefined
-                : this._dom.addEventListener(listener.Type, <EventListener>listener.Listener, listener.Options); // eslint-disable-line @typescript-eslint/unbound-method
+            listener.Suspended || this._dom.addEventListener(listener.Type, <EventListener>listener.Listener, listener.Options); // eslint-disable-line @typescript-eslint/unbound-method
         }
     }
 }
@@ -1048,35 +1046,31 @@ export abstract class AElementComponent<T extends (HTMLElementWithChildren | HTM
 
     /** @inheritdoc */
     public focus(options?: FocusOptions): this {
-        !this.Disabled ? this._dom.focus(options) : undefined;
+        this.Disabled || this._dom.focus(options);
         return this;
     }
 
     /** @inheritdoc */
     public blur(): this {
-        !this.Disabled ? this.DOM.blur() : undefined;
+        this.Disabled || this._dom.blur();
         return this;
     }
 
     /** @inheritdoc */
     public override onDidUnmount(): void {
-        this._parentDisabled
-            ? this.parentDisabled(false)
-            : undefined;
+        this._parentDisabled && this.parentDisabled(false);
         super.onDidUnmount();
     }
 
     /** @inheritdoc */
     public override onBeforeMount(parent: IElementWithChildrenComponent<HTMLElementWithChildren>): void {
         super.onBeforeMount(parent);
-        parent.Disabled || parent.ParentDisabled
-            ? this.parentDisabled(true)
-            : undefined;
+        (parent.Disabled || parent.ParentDisabled) && this.parentDisabled(true);
     }
 }
 
 // Augment class definition with the DOM attributes introduced by `mixinDOMAttributes()`.
-export interface AElementComponent<T extends (HTMLElementWithChildren | HTMLElementVoid), EventMap extends EventMapVoid = HTMLElementEventMap> extends AGlobalDOMAttributes<T, EventMap> { } // eslint-disable-line jsdoc/require-jsdoc
+export interface AElementComponent<T extends (HTMLElementWithChildren | HTMLElementVoid), EventMap extends EventMapVoid = HTMLElementEventMap> extends AGlobalDOMAttributes<T, EventMap> { } // eslint-disable-line jsdoc/require-jsdoc,@typescript-eslint/no-empty-object-type
 
 /**
  * Abstract base implementation of a component, *that does not allow* adding child components.
@@ -1609,7 +1603,7 @@ export abstract class AElementComponentWithChildren<T extends HTMLElementWithChi
 }
 
 // Augment class definition with `IChildren/AChildren` (see `static`).
-export interface AElementComponentWithChildren<T extends HTMLElementWithChildren, EventMap extends EventMapVoid = HTMLElementEventMap> extends AChildren<T, EventMap> { } // eslint-disable-line jsdoc/require-jsdoc
+export interface AElementComponentWithChildren<T extends HTMLElementWithChildren, EventMap extends EventMapVoid = HTMLElementEventMap> extends AChildren<T, EventMap> { } // eslint-disable-line jsdoc/require-jsdoc,@typescript-eslint/no-empty-object-type
 
 /**
  * Abstract base class for creating components that manage their own component tree/user interface
@@ -1752,13 +1746,13 @@ export abstract class AElementComponentWithInternalUI<UI extends (IElementCompon
 
     /** @inheritdoc */
     public override focus(options?: FocusOptions): this {
-        !this.Disabled ? this.ui.DOM.focus(options) : undefined;
+        this.Disabled || this.ui.DOM.focus(options);
         return this;
     }
 
     /** @inheritdoc */
     public override blur(): this {
-        !this.Disabled ? this.ui.DOM.blur() : undefined;
+        this.Disabled || this.ui.DOM.blur();
         return this;
     }
 
@@ -1816,18 +1810,14 @@ export abstract class AElementComponentWithInternalUI<UI extends (IElementCompon
 
     /** @inheritdoc */
     public override onDidUnmount(): void {
-        this._parentDisabled
-            ? this.parentDisabled(false)
-            : undefined;
+        this._parentDisabled && this.parentDisabled(false);
         super.onDidUnmount();
     }
 
     /** @inheritdoc */
     public override onBeforeMount(parent: IElementWithChildrenComponent<HTMLElementWithChildren>): void {
         super.onBeforeMount(parent);
-        parent.Disabled || parent.ParentDisabled
-            ? this.parentDisabled(true)
-            : undefined;
+        (parent.Disabled || parent.ParentDisabled) && this.parentDisabled(true);
     }
 
     /**
@@ -2004,10 +1994,10 @@ export abstract class AFragmentComponent extends AComponent implements IFragment
             component.DOM.parentNode?.removeChild(component.DOM);
         }
         this._dom.replaceChildren();
-        // @ts-ignore
+        // @ts-expect-error ---
         this._dom = undefined;
         this._children.length = 0;
-        // @ts-ignore
+        // @ts-expect-error ---
         this._children = undefined;
         super.dispose();
     }
@@ -2248,7 +2238,7 @@ export class AEventBus<EventMap extends Record<keyof EventMap, AnyType>> impleme
     public dispose(): this {
         this.bus.dispose();
         AEventBus.busRegistry.delete(this.name);
-        // @ts-ignore
+        // @ts-expect-error ---
         this.bus = undefined;
         return this;
     }

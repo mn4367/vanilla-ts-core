@@ -48,17 +48,17 @@ export async function getImportedModuleFileNames(
                 ? nodeResolve()
                 : undefined,
             useCommonJS
-                // @ts-ignore
+                // @ts-expect-error ---
                 ? commonjs()
                 : undefined,
             useJSON
-                // @ts-ignore
+                // @ts-expect-error ---
                 ? json()
                 : undefined,
         ],
         /* eslint-enable */
     });
-    const outputs = (await bundle.generate({})).output; // eslint-disable-line jsdoc/require-jsdoc
+    const outputs = (await bundle.generate({})).output;
     for (const output of outputs.filter(e => e.type === "chunk")) {
         for (const module of output.moduleIds) {
             if (!module.includes("?") && !module.includes("\0")) {
@@ -80,7 +80,6 @@ export async function getImportedModuleFileNames(
     };
 }
 
-/* eslint-disable no-irregular-whitespace */
 /**
  * Options for processing CSS input files.
  */
@@ -159,7 +158,6 @@ type CSSFileProcessingOptions = {
      */
     SkipEmptyLines?: boolean;
 };
-/* eslint-enable no-irregular-whitespace */
 
 /**
  * Options for finding and processing CSS input files.
@@ -310,7 +308,6 @@ export type ConcatCSSOptions = {
     OutputFile?: string;
 };
 
-/* eslint-disable no-irregular-whitespace */
 /**
  * Concatenates the content of multiple CSS files that are used by an application/a script into a
  * single CSS source/file. The process runs in a maximum of three steps:
@@ -492,23 +489,20 @@ export async function concatCSS(options: ConcatCSSOptions): Promise<string[]> {
             lines.shift();
         }
         const result: string[] = [];
-        options.Header === false
-            ? undefined
-            : options.Header === "file"
+        options.Header && (
+            options.Header === "file"
                 ? result.push(`/* ${resolvedFileName} */`)
                 : options.Header === "region"
                     ? result.push(`/* #region ${resolvedFileName} */`)
                     : typeof options.Header === "string"
                         ? result.push(options.Header)
-                        : typeof options.Header === "function"
-                            ? result.push(options.Header(fullCSSFileName, relativeFrom))
-                            : undefined;
+                        : typeof options.Header === "function" && result.push(options.Header(fullCSSFileName, relativeFrom))
+        );
         options.SkipEmptyLines
             ? result.push(...lines.map(e => e.trimEnd()).filter(e => e !== ""))
             : result.push(...lines);
-        options.Footer === false
-            ? undefined
-            : options.Footer === "cmt"
+        options.Footer && (
+            options.Footer === "cmt"
                 ? result.push("/* */\n")
                 : options.Footer === "end-region"
                     ? result.push("/* #endregion */\n")
@@ -516,9 +510,8 @@ export async function concatCSS(options: ConcatCSSOptions): Promise<string[]> {
                         ? result.push(`/* #endregion ${resolvedFileName} */\n`)
                         : typeof options.Footer === "string"
                             ? result.push(options.Footer)
-                            : typeof options.Footer === "function"
-                                ? result.push(options.Footer(fullCSSFileName, relativeFrom))
-                                : undefined;
+                            : typeof options.Footer === "function" && result.push(options.Footer(fullCSSFileName, relativeFrom))
+        );
         processedCSSFies.add(fullCSSFileName);
         return result;
     };
@@ -619,4 +612,3 @@ export async function concatCSS(options: ConcatCSSOptions): Promise<string[]> {
     opts.OutputFile && writeFileSync(opts.OutputFile, result.join("\n"));
     return result;
 }
-/* eslint-enable no-irregular-whitespace */

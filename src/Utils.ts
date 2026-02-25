@@ -134,7 +134,7 @@ export function mixin<
     for (const ctor of classes) {
         for (const name of Object.getOwnPropertyNames(ctor.prototype)) {
             const descriptor = Object.getOwnPropertyDescriptor(ctor.prototype, name);
-            if (descriptor && (name !== 'constructor')) {
+            if (descriptor && (name !== "constructor")) {
                 Object.defineProperty(
                     __extended__.prototype,
                     name,

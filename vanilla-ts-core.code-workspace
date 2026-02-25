@@ -24,14 +24,10 @@
                 "source.organizeImports": "explicit"
             }
         },
-        "eslint.options": {
-            "overrideConfigFile": "./eslintrc.json"
-        },
         "-eslint.format.enable": true,
         "eslint.validate": [
             "typescript"
         ],
-        "eslint.nodePath": ".",
     },
     "extensions": {
         "recommendations": [

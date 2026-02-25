@@ -21,7 +21,7 @@ import {
 /**
  * An event map that initially has no members.
  */
-export interface EventMapVoid { }
+export interface EventMapVoid { } // eslint-disable-line @typescript-eslint/no-empty-object-type
 
 /**
  * An event listener entry. This is the type which is used to add/remove event listeners on a
@@ -451,7 +451,7 @@ export interface IChildren {
      * @param components The components to insert. To simplify use, each element of `components` may
      * be `undefined` or `null`. If `components` contains multiple occurences of the same component,
      * only the first occurence will be handled.
-     * @throws `IChildren: <message>` if the component denoted by `at` is a child of
+     * @throws {string} `IChildren: <message>` if the component denoted by `at` is a child of
      * `components`.
      * @returns This instance.
      */
@@ -507,7 +507,7 @@ export interface IChildren {
      * may be `undefined` or `null`. If the length of `components` is `0`, _all_ children of this
      * component will be extracted and appended to `target`. If `components` contains multiple
      * occurences of the same component, only the first occurence will be handled.
-     * @throws `IChildren: <message>` if `target` is `this`.
+     * @throws {string} `IChildren: <message>` if `target` is `this`.
      * @returns This instance.
      */
     moveTo(target: IChildren, ...components: (INodeComponent<Node> | undefined | null)[]): this;
@@ -526,7 +526,8 @@ export interface IChildren {
      * or `null`. If the length of `components` is `0`, _all_ children of this component will be
      * extracted and inserted into `target`. If `components` contains multiple occurences of the
      * same component, only the first occurence will be handled.
-     * @throws `IChildren: <message>` if `target` is `this` or if `at` isn't a child of `target`.
+     * @throws {string} `IChildren: <message>` if `target` is `this` or if `at` isn't a child of
+     * `target`.
      * @returns This instance.
      */
     moveToAt(target: IChildren, at: number | INodeComponent<Node>, ...components: (INodeComponent<Node> | undefined | null)[]): this;
@@ -1157,7 +1158,7 @@ export interface IElementComponent<T extends HTMLElement, EventMap extends Event
      *   `important`.
      * - If `property` is an object `important` is ignored.
      */
-    style(property: CSSPropertyNames | CSSStyleDeclarations, value?: NullableString | undefined, important?: boolean): this;
+    style(property: CSSPropertyNames | CSSStyleDeclarations, value?: NullableString, important?: boolean): this;
 
     /**
      * Sets the focus to the DOM element of this component.\
@@ -1181,7 +1182,7 @@ export interface IElementComponent<T extends HTMLElement, EventMap extends Event
 /**
  * Base interface for HTML element based components, that *do not allow* adding children.
  */
-export interface IElementVoidComponent<T extends HTMLElementVoid, EventMap extends EventMapVoid = HTMLElementEventMap> extends IElementComponent<T, EventMap> { }
+export interface IElementVoidComponent<T extends HTMLElementVoid, EventMap extends EventMapVoid = HTMLElementEventMap> extends IElementComponent<T, EventMap> { } // eslint-disable-line @typescript-eslint/no-empty-object-type
 
 /**
  * Base interface for HTML element based components, that *do allow* adding children.
