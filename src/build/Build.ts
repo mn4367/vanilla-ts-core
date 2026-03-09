@@ -105,7 +105,8 @@ type CSSFileProcessingOptions = {
      *   return value conforms to valid CSS.
      *
      * Default: `region`.
-     * @see {@link CSSFileProcessingOptions.RelativeTo} for information on how the filenames written in the comments are formed.
+     * @see {@link CSSFileProcessingOptions.RelativeTo} for information on how the filenames written
+     * in the comments are formed.
      */
     Header?: "file" | "region" | false | `/*${string}*/` | ((fileName: string, relativeTo: string) => string);
     /**
@@ -136,7 +137,8 @@ type CSSFileProcessingOptions = {
      *   return value conforms to valid CSS.
      *
      * Default : `end-region`
-     * @see {@link CSSFileProcessingOptions.RelativeTo} for information on how the filenames written in the comments are formed.
+     * @see {@link CSSFileProcessingOptions.RelativeTo} for information on how the filenames written
+     * in the comments are formed.
      */
     Footer?: "cmt" | "end-region" | "end-region-file" | false | `/*${string}*/` | ((fileName: string, relativeTo: string) => string);
     /**
@@ -361,7 +363,7 @@ export type ConcatCSSOptions = {
  *       },
  *       RelativeTo: "./node_modules/",
  *       RollupOptions: {
- *         external: ["@vanilla-ts/core", "@vanilla-ts/dom", "skip-module1", "skip-module2", ...]
+ *         external: ["@vanilla-ts/core", "skip-module1", "skip-module2", ...]
  *       },
  *     },
  *     // Step 2: Get used CSS only from the local sources. This step could be merged into step 1
@@ -582,7 +584,8 @@ export async function concatCSS(options: ConcatCSSOptions): Promise<string[]> {
                         break;
                     }
                 }
-                // Find a file in the same directory of `fileName` that satisfies the following condition:
+                // Find a file in the same directory of `fileName` that satisfies the following
+                // condition:
                 // <moduleFileName.{cssExtension}> === lookupFileName.{swap '.js' with cssExtension}
                 // If found, take this file and continue with the next module filename.
                 for (const extension of opts.FileExtensions) {

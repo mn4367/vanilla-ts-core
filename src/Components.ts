@@ -280,15 +280,17 @@ export class CSSClassNameFactory extends ComponentFactory<IComponent> {
 }
 
 /**
- * Abstract base implementation for an application. Extending classes should override this function:
+ * Abstract base implementation for an application that also can be used to setup components (the
+ * class extends `ComponentFactory`). Extending classes can/should override this function if they
+ * want to set up components obtained by factory methods:
  * ```
  * setupComponent<T extends IComponent<HTMLElement>>(component: T): T
  * ```
- * Although calling `super.setupComponent()` in this implementation currently does nothing it's
+ * Although calling `super.setupComponent()` in this implementation here currently does nothing it's
  * nevertheless recommended.
  *
- * This class implements `IChildren` so that components can be added/removed/inserted directly to
- * the application instance which will forward them to the root element/component.
+ * This class also implements `IChildren` so that components can be added/removed/inserted directly
+ * to the application instance which will forward them to the root element/component.
  */
 export abstract class VTSApplication<EventMap extends EventMapVoid = HTMLElementEventMap> extends ComponentFactory<IComponent> implements IChildren { // eslint-disable-line @typescript-eslint/no-unsafe-declaration-merging
     /**
