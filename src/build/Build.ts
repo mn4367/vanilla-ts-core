@@ -2,7 +2,7 @@ import commonjs from "@rollup/plugin-commonjs";
 import json from "@rollup/plugin-json";
 import { nodeResolve } from "@rollup/plugin-node-resolve";
 import fg, { Options } from "fast-glob";
-import { existsSync, readFileSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import path from "node:path";
 import { rollup as _rollup, RollupLog, RollupOptions } from "rollup";
 
@@ -305,7 +305,8 @@ export type ConcatCSSOptions = {
     StripEmptyLinesAtEnd?: boolean;
     /**
      * The filename of the output file to which the concatenated CSS input files will be written. If
-     * this is omitted or an empty string no output file is written.
+     * this is omitted or an empty string no output file is written. If `OutputFile` contains a path
+     * to a directory that does not exist, this directory will be created.
      */
     OutputFile?: string;
 };
@@ -612,6 +613,9 @@ export async function concatCSS(options: ConcatCSSOptions): Promise<string[]> {
             result.pop();
         }
     }
-    opts.OutputFile && writeFileSync(opts.OutputFile, result.join("\n"));
+    if (opts.OutputFile) {
+        mkdirSync(path.dirname(opts.OutputFile), { recursive: true }); // eslint-disable-line jsdoc/require-jsdoc
+        writeFileSync(opts.OutputFile, result.join("\n"));
+    }
     return result;
 }
