@@ -1,31 +1,37 @@
-import { ANodeComponent } from "../src/Classes.js";
+import { ANodeComponent } from "../../src/Classes.js";
 import {
     ComponentFactory,
     ElementComponentVoid,
     ElementComponentWithChildren
-} from "../src/Components.js";
+} from "../../src/Components.js";
 import {
     NullableString
-} from "../src/Types.js";
+} from "../../src/Types.js";
 
 
-/**
- * Sample step by step implementation of a login component.
- * _Very important note:_ please don't feel intimidated by the sheer amount of code seemingly needed
- * for something rather trivial while Vanilla.ts at the same time claims that using it is easy and
- * doesn't force you to write much code. The example below shows what you would have to do if you'd
- * write every component *from scratch*. It's well possible to follow that approach (and doing so is
- * definitely no mistake, if you absolutely want to avoid any dependencies) but most components
- * shown below are already available in @vanilla-ts/dom and @vanilla-ts/components, most of them
- * more complete and with more features.
- * You should also keep in mind that any component shown below is rather general and reusable so you
- * could easily create variants or other composite components of them with little effort!
- */
+/*
+
+# Sample step by step implementation of a login component.
+
+_Very important note:_ please don't feel intimidated by the sheer amount of code seemingly needed
+for something rather trivial.
+
+The following example shows what you would have to do if you were to rewrite ___every single
+component from scratch___! It is entirely possible to take this approach (it's not a mistake if you
+absolutely want to avoid any dependencies), but all of the basic components shown below are already
+available in @vanilla-ts/dom and @vanilla-ts/components, better written, more complete, and with
+more features.
+
+However, the example also shows that even the following trivial components are already useful and
+reusable, and there is basically nothing wrong with them.
+
+*/
 
 
 ////////////////////////
 // Base components
 ////////////////////////
+// #region
 
 // Implementation for a text node component.
 export class TextComponent extends ANodeComponent<Text> {
@@ -213,10 +219,19 @@ export class Button extends ElementComponentWithChildren<HTMLButtonElement> {
     }
 }
 
+// Horizontal rule component based on an <hr> element.
+export class Hr extends ElementComponentVoid<HTMLHRElement> {
+    constructor() {
+        super("hr");
+    }
+}
+// #endregion
+
 
 ////////////////////////
-// The login component
+// The final login component
 ////////////////////////
+// #region
 
 // Options for the login component
 export interface ILoginComponentOptions {
@@ -280,16 +295,25 @@ export class LoginComponent extends LabeledContainer {
         return this.loginButton;
     }
 }
+// #endregion
 
 
 ////////////////////////
 // Component factories
 ////////////////////////
+// #region
 
 // Factory for button components.
 export class ButtonFactory extends ComponentFactory<Button> {
     public button(caption: string): Button {
         return this.setupComponent(new Button(caption));
+    }
+}
+
+// Factory for hr components.
+export class HrFactory extends ComponentFactory<Hr> {
+    public hr(): Hr {
+        return this.setupComponent(new Hr());
     }
 }
 
@@ -320,3 +344,4 @@ export class LoginComponentFactory extends ComponentFactory<LoginComponent> {
         return this.setupComponent(new LoginComponent(opts), true);
     }
 }
+// #endregion

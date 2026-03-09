@@ -1,0 +1,22 @@
+:root {
+    --font-primary: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+    --font-size: 10pt;
+    --base-size: 1rem;
+    --base-size-half: 0.5rem;
+}
+html {
+    font-family: var(--font-primary);
+    font-size: var(--font-size);
+}
+* {
+    box-sizing: border-box;
+    -webkit-user-select: none;
+    user-select: none;
+    cursor: default;
+}
+p {
+    margin: 0;
+    padding: var(--base-size);
+    border-radius: var(--base-size-half);
+    background: hsl(0, 0%, 95%);
+}

@@ -1,8 +1,11 @@
+.VSCodeCounter
 attic/
 example/index.js
 example/index.js.map
 example/out
+playground/index.js
+playground/index.js.map
+playground/out
 lib/
 node_modules/
 types/
-.VSCodeCounter

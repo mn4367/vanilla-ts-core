@@ -59,14 +59,18 @@
     "typescript": "5.9.3"
   },
   "scripts": {
-    "Watch": "npm-run-all -p watch:*",
-    "Clean": "shx rm -rf ./types ./lib ./example/out ./example/index.js*",
+    "Watch": "npm-run-all -p watch:**",
+    "Clean": "shx rm -rf ./types ./lib ./example/out ./example/index.js* ./playground/out ./playground/index.js*",
     "watch:src": "tsc -w -p ./src/tsconfig.src.json",
-    "watch:example": "tsc-watch -p ./example/tsconfig.example.json --onSuccess \"npm run pack:example\"",
+    "watch:example": "tsc-watch -p ./example/src/tsconfig.example.json --onSuccess \"npm run pack:example\"",
+    "watch:playground": "tsc-watch -p ./playground/src/tsconfig.playground.json --onSuccess \"npm run pack:playground\"",
     "compile:src": "tsc -p ./src/tsconfig.src.json",
-    "compile:example": "tsc -p ./example/tsconfig.example.json",
-    "pack:example": "rollup --silent -c ./build/rollup.config.example.mjs",
-    "pack:example:compress": "rollup --silent -c ./build/rollup.config.example.mjs --environment COMPRESS",
+    "compile:example": "tsc -p ./example/src/tsconfig.example.json",
+    "compile:playground": "tsc -p ./playground/src/tsconfig.playground.json",
+    "pack:example": "rollup --silent -c ./example/build/rollup.config.example.mjs",
+    "pack:example:compress": "rollup --silent -c ./example/build/rollup.config.example.mjs --environment COMPRESS",
+    "pack:playground": "rollup --silent -c ./playground/build/rollup.config.playground.mjs",
+    "pack:playground:compress": "rollup --silent -c ./playground/build/rollup.config.playground.mjs --environment COMPRESS",
     "lint": "eslint -c ./eslint.config.mjs"
   }
 }
