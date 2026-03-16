@@ -41,6 +41,7 @@ import {
     NullableString
 } from "./Types.js";
 import {
+    cid,
     mixinDOMProperties
 } from "./Utils.js";
 
@@ -175,32 +176,32 @@ export abstract class CheckedAttr<T extends HTMLInputElement, EventMap extends H
 /**
  * Possible values for the `crossOrigin` attribute.
  */
-export type CrossOrginAttributeValues = "anonymous" | "use-credentials" | "" | null;
+export type CrossOriginAttributeValues = "anonymous" | "use-credentials" | "" | null;
 
 /**
  * 'CrossOrigin' getter/setter and set method returning this instance.
  */
-export abstract class CrossOrginAttr<T extends HTMLElementWithCrossorigin, EventMap extends HTMLElementEventMap = HTMLElementEventMap> extends AElementComponent<T, EventMap> {
+export abstract class CrossOriginAttr<T extends HTMLElementWithCrossorigin, EventMap extends HTMLElementEventMap = HTMLElementEventMap> extends AElementComponent<T, EventMap> {
     /**
-     * Get/set the `crossOrigin` attribute value of the component. Allowed values are `anonymous`,
+     * Get/set the `crossorigin` attribute value of the component. Allowed values are `anonymous`,
      * `use-credentials` an empty string and `null` (both of the latter remove the attribute).
      */
-    public get CrossOrigin(): CrossOrginAttributeValues {
-        return <CrossOrginAttributeValues>this._dom.crossOrigin;
+    public get CrossOrigin(): CrossOriginAttributeValues {
+        return <CrossOriginAttributeValues>this._dom.crossOrigin;
     }
     /** @inheritdoc */
-    public set CrossOrigin(v: CrossOrginAttributeValues) {
+    public set CrossOrigin(v: CrossOriginAttributeValues) {
         this._dom.crossOrigin = v;
     }
 
     /**
-     * Set `crossOrigin` attribute value of the component. Allowed values are `anonymous`,
+     * Set `crossorigin` attribute value of the component. Allowed values are `anonymous`,
      * `use-credentials` an empty string and `null` (both of the latter remove the attribute).
      * @param v The value to be set.
      * @returns This instance.
      */
-    public crossOrigin(v: CrossOrginAttributeValues): this {
-        this.attrib("dirname", v);
+    public crossOrigin(v: CrossOriginAttributeValues): this {
+        this.attrib("crossorigin", v);
         return this;
     }
 }
