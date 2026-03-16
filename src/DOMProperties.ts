@@ -246,7 +246,7 @@ export abstract class DataListAttr<T extends HTMLInputElement, EventMap extends 
             if (values.length === 0) {
                 return this;
             }
-            dataListID = `dl${Date.now().valueOf()}${Math.floor(Math.random() * 1000)}`;
+            dataListID = `dl${cid().slice(1)}`;
         }
         let dataList = document.getElementById(dataListID);
         if (dataList && values.length === 0) {
@@ -411,59 +411,6 @@ export abstract class HreflangAttr<T extends HTMLElementWithHreflang, EventMap e
      */
     public hreflang(v: NullableString): this {
         this.attrib("hreflang", v);
-        return this;
-    }
-}
-
-/**
- * 'Open' getter/setter and set method returning this instance.
- */
-export abstract class OpenAttr<T extends HTMLElementWithOpen, EventMap extends HTMLElementEventMap = HTMLElementEventMap> extends AElementComponent<T, EventMap> {
-    /**
-     * Get/set the `open` attribute of the component.
-     */
-    public get Open(): boolean {
-        return this._dom.open;
-    }
-    /** @inheritdoc */
-    public set Open(v: boolean) {
-        this._dom.open = v;
-    }
-
-    /**
-     * Sets the `open` attribute of the component.
-     * @param v The value to be set.
-     * @returns This instance.
-     */
-    public open(v: boolean): this {
-        this._dom.open = v;
-        return this;
-    }
-}
-
-/**
- * 'Ping' getter/setter and set method returning this instance.
- */
-export abstract class PingAttr<T extends HTMLElementWithPing, EventMap extends HTMLElementEventMap = HTMLElementEventMap> extends AElementComponent<T, EventMap> {
-    /**
-     * Get/set the `ping` attribute of the component. If the length of `v` is `0`, the attribute is
-     * removed.
-     */
-    public get Ping(): string[] {
-        return this._dom.ping.split(" ");
-    }
-    /** @inheritdoc */
-    public set Ping(v: string[]) {
-        this.ping(...v);
-    }
-
-    /**
-     * Sets the `ping` attribute of the component.
-     * @param v The value to be set. If the length of `v` is `0`, the attribute is removed.
-     * @returns This instance.
-     */
-    public ping(...v: string[]): this {
-        this.attrib("loading", v.length === 0 ? null : v.join(" "));
         return this;
     }
 }
@@ -767,6 +714,32 @@ export abstract class NativeDisabledAttr<T extends HTMLElementWithDisabled, Even
 }
 
 /**
+ * 'Open' getter/setter and set method returning this instance.
+ */
+export abstract class OpenAttr<T extends HTMLElementWithOpen, EventMap extends HTMLElementEventMap = HTMLElementEventMap> extends AElementComponent<T, EventMap> {
+    /**
+     * Get/set the `open` attribute of the component.
+     */
+    public get Open(): boolean {
+        return this._dom.open;
+    }
+    /** @inheritdoc */
+    public set Open(v: boolean) {
+        this._dom.open = v;
+    }
+
+    /**
+     * Sets the `open` attribute of the component.
+     * @param v The value to be set.
+     * @returns This instance.
+     */
+    public open(v: boolean): this {
+        this._dom.open = v;
+        return this;
+    }
+}
+
+/**
  * 'Pattern' getter/setter and set method returning this instance.
  */
 export abstract class PatternAttr<T extends HTMLInputElement, EventMap extends HTMLElementEventMap = HTMLElementEventMap> extends AElementComponent<T, EventMap> {
@@ -789,6 +762,33 @@ export abstract class PatternAttr<T extends HTMLInputElement, EventMap extends H
      */
     public pattern(v: NullableString): this {
         this.attrib("pattern", v);
+        return this;
+    }
+}
+
+/**
+ * 'Ping' getter/setter and set method returning this instance.
+ */
+export abstract class PingAttr<T extends HTMLElementWithPing, EventMap extends HTMLElementEventMap = HTMLElementEventMap> extends AElementComponent<T, EventMap> {
+    /**
+     * Get/set the `ping` attribute of the component. If the length of `v` is `0`, the attribute is
+     * removed.
+     */
+    public get Ping(): string[] {
+        return this._dom.ping.split(" ");
+    }
+    /** @inheritdoc */
+    public set Ping(v: string[]) {
+        this.ping(...v);
+    }
+
+    /**
+     * Sets the `ping` attribute of the component.
+     * @param v The value to be set. If the length of `v` is `0`, the attribute is removed.
+     * @returns This instance.
+     */
+    public ping(...v: string[]): this {
+        this.attrib("ping", v.length === 0 ? null : v.join(" "));
         return this;
     }
 }

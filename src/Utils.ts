@@ -219,17 +219,17 @@ export const ModifierKeys = (() => {
         keys.Shift = event.shiftKey;
         keys.Ctrl = event.ctrlKey;
         keys.Alt = event.altKey;
-        keys.AltGr = event.getModifierState?.("AltGraph");
+        keys.AltGr = !!event.getModifierState?.("AltGraph");
         keys.Meta = event.metaKey;
         // For support of the following statuses, see:
         // https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/getModifierState
-        keys.Fn = event.getModifierState?.("Fn");
-        keys.CapsLock = event.getModifierState?.("CapsLock");
-        keys.NumLock = event.getModifierState?.("NumLock");
-        keys.ScrollLock = event.getModifierState?.("ScrollLock");
+        keys.Fn = !!event.getModifierState?.("Fn");
+        keys.CapsLock = !!event.getModifierState?.("CapsLock");
+        keys.NumLock = !!event.getModifierState?.("NumLock");
+        keys.ScrollLock = !!event.getModifierState?.("ScrollLock");
     };
-    window.addEventListener("keydown", (event: KeyboardEvent) => update(event), { capture: true }); // eslint-disable-line jsdoc/require-jsdoc
-    window.addEventListener("keyup", (event: KeyboardEvent) => update(event), { capture: true }); // eslint-disable-line jsdoc/require-jsdoc
+    typeof window !== "undefined" && window.addEventListener("keydown", (event: KeyboardEvent) => update(event), { capture: true }); // eslint-disable-line jsdoc/require-jsdoc
+    typeof window !== "undefined" && window.addEventListener("keyup", (event: KeyboardEvent) => update(event), { capture: true }); // eslint-disable-line jsdoc/require-jsdoc
     return keys as Readonly<{
         /* eslint-disable jsdoc/require-jsdoc */
         Shift: boolean;
