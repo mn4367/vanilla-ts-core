@@ -14,9 +14,7 @@ import {
     IFragment,
     IGlobalDOMAttributes,
     IIsElementComponent,
-    INodeComponent,
-    Phrase,
-    Phrases
+    INodeComponent
 } from "./Interfaces.js";
 import {
     AnyObject,
@@ -36,6 +34,8 @@ import {
     NullableBoolean,
     NullableNumber,
     NullableString,
+    Phrase,
+    Phrases,
     PopoverAttrValues,
     ResizableValues
 } from "./Types.js";
@@ -1425,26 +1425,18 @@ export abstract class AChildren<T extends HTMLElementWithChildren, EventMap exte
     }
 
     /**
-     * The function `IChildren.clear()` requires that _all_ child components must be removed and
-     * disposed of. Since the `AChildren` mixin has no knowledge of components outside the child
-     * collection, the parent component itself must remove/dispose such components. __For this task
-     * any component that uses the `AChildren` mixin _must_ implement `clearOwner()` even if there
-     * is nothing to do in `clearOwner()`!__ `clear()` always calls the `clearOwner()` at the end.\
-     * __Note__: `clearOwner()` _must never be called manually_ except in implementations of
-     * `clearOwner()` where it is mandatory to call `super.clearOwner()`!
-     * @example
-     * ```
-     * protected override clearOwner(): this {
-     *   // (Optional) Cleanup
-     *   // ...
-     *   super.clearOwner();
-     *   return this;
-     * }
-     * ```
-     * @see {@link AElementComponentWithChildren}
-     * @returns This instance.
+     * `IChildren.clear()` requires that _all_ child components must be removed and disposed of.
+     * Since the `AChildren` mixin has no knowledge of components outside the child collection, the
+     * parent component itself must remove/dispose such components. Examples for implementing or
+     * leaving out `clearOwner()` can be found in the examples section of the documentation of this
+     * class.
+     *
+     * Note: the function is marked as `abstract` and at the same time optional to indicate that it
+     * is not always mandatory to implement it. The TypeScript compiler allows this kind of
+     * declaration but in practice non-abstract classes extending `AChildren` would need to
+     * implement it.
      */
-    protected abstract clearOwner(): this;
+    protected abstract clearOwner?(): void;
 
     /** @inheritdoc */
     public clear(): this {
@@ -1458,8 +1450,10 @@ export abstract class AChildren<T extends HTMLElementWithChildren, EventMap exte
             component.onDidUnmount();
             component.dispose();
         }
-        // Also clear components possibly existing besides the children collection.
-        return this.clearOwner();
+        // Also clear components possibly existing besides the children collection. The
+        // implementation of `clearOwner()` is, however, optional, see there.
+        this.clearOwner?.();
+        return this;
     }
 }
 // #endregion AChildren
@@ -1470,13 +1464,13 @@ export abstract class AChildren<T extends HTMLElementWithChildren, EventMap exte
  */
 export abstract class AElementComponentWithChildren<T extends HTMLElementWithChildren, EventMap extends EventMapVoid = HTMLElementEventMap> extends AElementComponent<T, EventMap> implements IElementWithChildrenComponent<T, EventMap> { // eslint-disable-line @typescript-eslint/no-unsafe-declaration-merging
     /**
-     * Inner helper class for creating DOM text node components without relying on the 'public'
-     * `TextComponent` class exported from `@vanilla-ts/core/Components.ts`.
+     * Inner helper class for creating DOM text node components without relying on a similar
+     * component available elsewhere (e.g. `Text` class exported from `@vanilla-ts/dom/Text.ts`).
      */
-    static #DOMTextNode_: Constructor<INodeComponent<Text>>;
+    static #DOMTextNode_: Constructor<INodeComponent<globalThis.Text>>;
 
     static {
-        AElementComponentWithChildren.#DOMTextNode_ = class DOMTextNode extends ANodeComponent<Text> { // eslint-disable-line jsdoc/require-jsdoc
+        AElementComponentWithChildren.#DOMTextNode_ = class Text extends ANodeComponent<globalThis.Text> { // eslint-disable-line jsdoc/require-jsdoc
             constructor(text: string) { // eslint-disable-line jsdoc/require-jsdoc
                 super();
                 this._dom = document.createTextNode(text);
@@ -1588,11 +1582,10 @@ export abstract class AElementComponentWithChildren<T extends HTMLElementWithChi
      * almost nothing to do except for removing DOM child nodes which have been left over (usually
      * pure text nodes form `Phrase/phrase()`).
      * @see {@link AChildren.clearOwner()}
-     * @returns This instance.
+     * @see {@link dispose()}
      */
-    protected clearOwner(): this {
+    protected clearOwner(): void {
         this._dom.replaceChildren();
-        return this;
     }
 
     /** @inheritdoc */
@@ -1823,9 +1816,8 @@ export abstract class AElementComponentWithInternalUI<UI extends (IElementCompon
     /**
      * @see {@link clear()}
      * @see {@link AChildren.clearOwner()}
-     * @returns This instance.
      */
-    protected clearOwner(): this {
+    protected clearOwner(): void {
         if (!this.#initialized) {
             throw new Error("'clear()'/'clearOwner()' can only be called once after 'initialize()'.");
         }
@@ -1836,7 +1828,6 @@ export abstract class AElementComponentWithInternalUI<UI extends (IElementCompon
         } else {
             this.ui.clear();
         }
-        return this;
     }
 
     /**
@@ -1854,7 +1845,8 @@ export abstract class AElementComponentWithInternalUI<UI extends (IElementCompon
      * @returns This instance.
      */
     public clear(): this {
-        return this.clearOwner();
+        this.clearOwner();
+        return this;
     }
 
     /** @inheritdoc */

@@ -334,12 +334,11 @@ export abstract class VTSApplication<EventMap extends EventMapVoid = HTMLElement
     }
 
     /** @inheritdoc */
-    protected clearOwner(): this {
+    protected clearOwner(): void {
         // __Note:__ It is assumed that the root element has no other real components attached to it
         // (its just a wrapped DOM element) so `this.root.clear()` is not called here. This also
         // ensures, that other pure DOM child elements of `this.rootElement` are not removed. If a
         // different behavior is need, this has to implemented in a derived class in `clearOwner()`.
-        return this;
     }
 
     static {

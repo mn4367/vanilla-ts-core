@@ -8,9 +8,7 @@ import {
     ElementComponentWithChildren
 } from "./Components.js";
 import {
-    INodeComponent,
-    Phrase,
-    Phrases
+    INodeComponent
 } from "./Interfaces.js";
 import {
     HTMLElementWithAlt,
@@ -38,7 +36,9 @@ import {
     HTMLElementWithTarget,
     HTMLElementWithType,
     NullableNumber,
-    NullableString
+    NullableString,
+    Phrase,
+    Phrases
 } from "./Types.js";
 import {
     cid,

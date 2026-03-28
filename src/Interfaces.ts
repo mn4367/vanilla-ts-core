@@ -8,11 +8,12 @@ import {
     EnterKeyHintAttrValues,
     HTMLElementVoid,
     HTMLElementWithChildren,
-    HTMLElementWithPhrasingContent,
     InputModeAttrValues,
     NullableBoolean,
     NullableNumber,
     NullableString,
+    Phrase,
+    Phrases,
     PopoverAttrValues,
     ResizableValues
 } from "./Types.js";
@@ -546,20 +547,6 @@ export interface IChildren {
      */
     clear(): this;
 }
-
-/**
- * Type of phrase content for elements with phrasing content (single phrase like one string or a
- * span element (which may contain further phrases)).
- * @see https://developer.mozilla.org/en-US/docs/Web/HTML/Content_categories#phrasing_content
- */
-export type Phrase = string | INodeComponent<HTMLElementWithPhrasingContent | Text>;
-
-/**
- * Type of phrase content for elements with phrasing content (multiple phrases like strings or a
- * span elements (which may contain further phrases) or any combination of strings and phrases).
- * @see https://developer.mozilla.org/en-US/docs/Web/HTML/Content_categories#phrasing_content
- */
-export type Phrases = Array<Phrase>;
 
 /**
  * Base inteface for all components.
@@ -1210,7 +1197,7 @@ export interface IElementWithChildrenComponent<T extends HTMLElementWithChildren
      *   string but instead set `textContent` to the string. This is done for speed reasons and
      *   based on the assumption that a single string does not require its own component (setting a
      *   dedicated single instance of `INodeComponent<Text>` remains of course possible).
-     * @see https://developer.mozilla.org/en-US/docs/Web/HTML/Content_categories#phrasing_content
+     * @see https://developer.mozilla.org/en-US/docs/Web/HTML/Guides/Content_categories#phrasing_content
      * @example
      * ```typescript
      * import { Em, Span, Text } from "@vanilla-ts/dom";
@@ -1263,7 +1250,7 @@ export interface IElementWithChildrenComponent<T extends HTMLElementWithChildren
      *   (setting a dedicated single instance of `INodeComponent<Text>` remains of course possible).
      * @param phrase The phrasing content to be set as the new content for the component.
      * @returns This instance.
-     * @see https://developer.mozilla.org/en-US/docs/Web/HTML/Content_categories#phrasing_content
+     * @see https://developer.mozilla.org/en-US/docs/Web/HTML/Guides/Content_categories#phrasing_content
      * @example
      * ```typescript
      * import { Em, Span } from "@vanilla-ts/dom";

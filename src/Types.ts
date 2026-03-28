@@ -1,3 +1,5 @@
+import { INodeComponent } from "./Interfaces.js";
+
 
 //////////////////////////////
 // #region Global types
@@ -79,7 +81,7 @@ export type HTMLElementWithChildrenTagName = Exclude<keyof HTMLElementTagNameMap
 // #region Narrowed down HTML element types
 /**
  * Tag names of HTML elements with phrasing content.
- * @see https://developer.mozilla.org/en-US/docs/Web/HTML/Content_categories#phrasing_content
+ * @see https://developer.mozilla.org/en-US/docs/Web/HTML/Guides/Content_categories#phrasing_content
  */
 export type HTMLElementWithPhrasingContentTagName =
     | "abbr" | "audio" | "b" | "bdi" | "bdo" | "br" | "button" | "canvas" | "cite" | "code" | "data"
@@ -87,13 +89,82 @@ export type HTMLElementWithPhrasingContentTagName =
     | "mark" | /*"math" |*/ "meter" | "noscript" | "object" | "output" | "picture" | "progress"
     | "q" | "ruby" | "s" | "samp" | "script" | "select" | "slot" | "small" | "span" | "strong"
     | "sub" | "sup" | /*"svg" |*/ "template" | "textarea" | "time" | "u" | "var" | "video" | "wbr";
+//| "a" | "area" | "del" | "ins" | "link" | "map" | "meta"
 
 /**
  * HTML elements with phrasing content.
- * @see https://developer.mozilla.org/en-US/docs/Web/HTML/Content_categories#phrasing_content
+ * @see https://developer.mozilla.org/en-US/docs/Web/HTML/Guides/Content_categories#phrasing_content
  */
 export type HTMLElementWithPhrasingContent = HTMLElementTagNameMap[HTMLElementWithPhrasingContentTagName];
 // export type HTMLElementWithPhrasingContent = HTMLElementTagNameMap[Exclude<HTMLElementWithPhrasingContentTagName, "svg" | "math">];
+
+/**
+ * Type of content for elements with phrasing content.
+ *
+ * __Important note:__ This data type is more of a rough guide or hint than a precise type
+ * specification. Due to the structural type system of TypeScript it is possible to use, for
+ * example, a `Section` component (from `@vanilla-ts/dom`) in cases where a component of type
+ * `PhrasingContent` is expected. There are also overlaps between `PhrasingContent` and
+ * `FlowContent` components, e.g. `Button`, `Img` etc. since phrasing content is a subset of flow
+ * content.
+ * @see https://developer.mozilla.org/en-US/docs/Web/HTML/Guides/Content_categories#flow_content
+ */
+export type PhrasingContent = INodeComponent<HTMLElementWithPhrasingContent | Text | Comment>;
+
+/**
+ * Type of content for elements with phrasing content (single phrase like one string or a span
+ * element (which may contain further phrases)). The type is intended to be used for the `Phrase`,
+ * `Rephrase` properties and their corresponding functions `phrase()` and `rephrase()`. They mostly
+ * exist for convenience and readability reasons, e.g. to be able to use something like
+ * `new P("Hello world")` or `<someEm>.phrase("Search")`. This type is equal to `PhrasingContent`
+ * but also allows strings (auto-transformed to DOM text nodes by the properties/functions above).
+ * @see {@link PhrasingContent}
+ */
+export type Phrase = PhrasingContent | string;
+
+/**
+ * An array of `Phrase` components.
+ * @see {@link Phrase}
+ */
+export type Phrases = Array<Phrase>;
+
+/**
+ * Tag names of HTML elements with flow content.
+ * @see https://developer.mozilla.org/en-US/docs/Web/HTML/Guides/Content_categories#flow_content
+ */
+export type HTMLElementWithFlowContentTagName =
+    | "a" | "abbr" | "address" | "article" | "aside" | "audio" | "b" | "bdi" | "bdo" | "blockquote"
+    | "br" | "button" | "canvas" | "cite" | "code" | "data" | "datalist" | "del" | "details" | "dfn"
+    | "dialog" | "div" | "dl" | "em" | "embed" | "fieldset" | "figure" | "footer" | "form"
+    | /*"geolocation" |*/ "h1" | "h2" | "h3" | "h4" | "h5" | "h6" | "header" | "hgroup" | "hr" | "i"
+    | "iframe" | "img" | "input" | "ins" | "kbd" | "label" | "main" | "map" | "mark"
+    | /*"math" |*/ "menu" | "meter" | "nav" | "noscript" | "object" | "ol" | "output" | "p"
+    | "picture" | "pre" | "progress" | "q" | "ruby" | "s" | "samp" | "script" | "search" | "section"
+    | "select" | "slot" | "small" | "span" | "strong" | "sub" | "sup" | /*"svg" |*/ "table"
+    | "template" | "textarea" | "time" | "u" | "ul" | "var" | "video" | "wbr";
+// | "area" | "link" | "meta";
+
+/**
+ * HTML elements with flow content.
+ * @see https://developer.mozilla.org/en-US/docs/Web/HTML/Guides/Content_categories#flow_content
+ */
+export type HTMLElementWithFlowContent = HTMLElementTagNameMap[HTMLElementWithFlowContentTagName];
+// export type HTMLElementWithFlowContent = HTMLElementTagNameMap[Exclude<HTMLElementWithFlowContentTagName, "geolocation" | "svg" | "math">];
+
+/**
+ * Type of content for elements with flow content.
+ *
+ * __Important note:__ This data type is more of a rough guide or hint than a precise type
+ * specification. It basically says that any component qualifies as flow content.
+ * @see https://developer.mozilla.org/en-US/docs/Web/HTML/Guides/Content_categories#flow_content
+ */
+export type FlowContent = INodeComponent<HTMLElementWithFlowContent | Text | Comment>;
+
+/**
+ * An array of `FlowContent` components.
+ * @see {@link FlowContent}
+ */
+export type FlowContents = Array<FlowContent>;
 
 /**
  * HTML elements which have a native `disabled` property (element types).
