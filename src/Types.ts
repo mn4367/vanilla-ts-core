@@ -21,6 +21,13 @@ export type AConstructor<T = AnyObject> = abstract new (...args: AnyType[]) => T
 export type Ctor<T> = Constructor<T> | AConstructor<T>; // eslint-disable-line jsdoc/require-jsdoc
 
 /**
+ * Allows to define types like this:\
+ * `interface Foo extends Bar, Named<{ SomeProp: string; }> { }`\
+ * (because `interface Foo extends Bar, { SomeProp: string; }` does not work.
+ */
+export type Named<T> = T;
+
+/**
  * String that can also be `null`.
  */
 export type NullableString = string | null;

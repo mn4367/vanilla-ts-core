@@ -3,12 +3,12 @@ import {
     AComponentFactory,
     AElementComponentVoid,
     AElementComponentWithChildren,
-    AFragmentComponent
+    AFragmentComponent,
+    IChildrenMixin
 } from "./Classes.js";
 import {
     ComponentType,
     EventMapVoid,
-    IChildren,
     IComponent,
     IElementWithChildrenComponent,
     IIsElementComponent,
@@ -51,7 +51,7 @@ export class ElementComponentVoid<T extends HTMLElementVoid, EventMap extends Ev
  * Base implementation for all components, *that do allow* to add child components.
  * @see {@link AElementComponentWithChildren}
  */
-export class ElementComponentWithChildren<T extends HTMLElementWithChildren, EventMap extends EventMapVoid = HTMLElementEventMap> extends AElementComponentWithChildren<T, EventMap> {
+export class ElementComponentWithChildren<T extends HTMLElementWithChildren, Child extends INodeComponent<Node> = INodeComponent<Node>, EventMap extends EventMapVoid = HTMLElementEventMap> extends AElementComponentWithChildren<T, Child, EventMap> {
     /**
      * Create instance based on an HTML element type with children.
      * @param _tagName Tag name of the HTML element.
@@ -95,7 +95,7 @@ export class WrappedDOMElementComponentVoid<EventMap extends EventMapVoid = HTML
  * to an already existing DOM element, for example for building an application inside an arbitrary
  * (empty) div element somewhere in the page.
  */
-export class WrappedDOMElementComponentWithChildren<EventMap extends EventMapVoid = HTMLElementEventMap> extends AElementComponentWithChildren<HTMLElementWithChildren, EventMap> {
+export class WrappedDOMElementComponentWithChildren<Child extends INodeComponent<Node> = INodeComponent<Node>, EventMap extends EventMapVoid = HTMLElementEventMap> extends AElementComponentWithChildren<HTMLElementWithChildren, Child, EventMap> {
     /**
      * Create an instance that wraps a target DOM element with a component instance.
      * @param target The DOM element to be wrapped.
@@ -292,7 +292,7 @@ export class CSSClassNameFactory extends ComponentFactory<IComponent> {
  * This class also implements `IChildren` so that components can be added/removed/inserted directly
  * to the application instance which will forward them to the root element/component.
  */
-export abstract class VTSApplication<EventMap extends EventMapVoid = HTMLElementEventMap> extends ComponentFactory<IComponent> implements IChildren { // eslint-disable-line @typescript-eslint/no-unsafe-declaration-merging
+export abstract class VTSApplication<EventMap extends EventMapVoid = HTMLElementEventMap> extends ComponentFactory<IComponent> { // eslint-disable-line @typescript-eslint/no-unsafe-declaration-merging
     /**
      * The root DOM container element for all components to be added.
      */
@@ -300,7 +300,7 @@ export abstract class VTSApplication<EventMap extends EventMapVoid = HTMLElement
     /**
      * Root container component for this application and all components to be added.
      */
-    protected root: WrappedDOMElementComponentWithChildren<EventMap>;
+    protected root: WrappedDOMElementComponentWithChildren<INodeComponent<Node>, EventMap>;
 
     /**
      * Build an app within the given root element.
@@ -322,7 +322,7 @@ export abstract class VTSApplication<EventMap extends EventMapVoid = HTMLElement
      * respective functions of `VTSApplication` itself! `Root` should only be used for styling or
      * other (readonly) purposes!
      */
-    public get Root(): IElementWithChildrenComponent<HTMLElementWithChildren, EventMap> {
+    public get Root(): IElementWithChildrenComponent<HTMLElementWithChildren, INodeComponent<Node>, EventMap> {
         return this.root;
     }
 
@@ -348,7 +348,7 @@ export abstract class VTSApplication<EventMap extends EventMapVoid = HTMLElement
 }
 
 // Augment class definition with `IChildren` (see `static`).
-export interface VTSApplication<EventMap extends EventMapVoid = HTMLElementEventMap> extends ComponentFactory<IComponent>, AChildren<HTMLElement, EventMap> { } // eslint-disable-line jsdoc/require-jsdoc
+export interface VTSApplication extends IChildrenMixin { } // eslint-disable-line @typescript-eslint/no-empty-object-type,@typescript-eslint/no-unsafe-declaration-merging,jsdoc/require-jsdoc
 
 /**
  * A class that serves as the root for an application which is appended to an existing DOM element.

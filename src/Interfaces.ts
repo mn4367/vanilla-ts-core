@@ -376,13 +376,13 @@ export interface IGlobalDOMAttributes {
  * component.
  * @see The comment for `clear()` on how this affects the implementation of this function.
  */
-export interface IChildren {
+export interface IChildren<Child extends INodeComponent<Node> = INodeComponent<Node>> {
     /**
      * The child components of this component, includes all children based on a node _or_ element.\
      * __Note:__ This must be a _copy_ of the (presumably internal) list of children to avoid
      * manipulation by the recipient.
      */
-    readonly Children: INodeComponent<Node>[];
+    readonly Children: Child[];
 
     /**
      * The child components of this component, _only_ includes children based on an element.\
@@ -394,30 +394,30 @@ export interface IChildren {
     /**
      * The first component in the collection of this components children.
      */
-    readonly First: INodeComponent<Node> | undefined;
+    readonly First: Child | undefined;
 
     /**
      * The last component in the collection of this components children.
      */
-    readonly Last: INodeComponent<Node> | undefined;
+    readonly Last: Child | undefined;
 
     /**
-     * Append child components.
-     * - Append the components as child elements to this component.
-     * - Also append the underlying Node/HTML Element of each component to the underlying HTML
-     *   element of this component.
+     * Append children.
+     * - Append the children as child elements to this component.
+     * - Also append the underlying Node/HTML Element of each child to the underlying HTML element
+     * of this component.
      *
      * This function can be used to reorder children inside this component, e.g.
      * `this.append(...this.Children.reverse())`.
      *
-     * There are no restrictions for child components, they can be newly created, mounted to another
+     * There are no restrictions for children, they can be newly created, mounted to another
      * instance of `IChildren`/`IFragment` or mounted to this instance.
-     * @param components The components to append. To simplify use, each element of `components` may
-     * be `undefined` or `null`. If `components` contains multiple occurences of the same component,
-     * only the first occurence will be handled.
+     * @param children The children to append. To simplify use, each element of `children` may be
+     * `undefined` or `null`. If `children` contains multiple occurences of the same child, only the
+     * first occurence will be handled.
      * @returns This instance.
      */
-    append(...components: (INodeComponent<Node> | undefined | null)[]): this;
+    append(...children: (Child | undefined | null)[]): this;
 
     /**
      * Append the children (components) of a fragment to this component. After appending the
@@ -431,32 +431,31 @@ export interface IChildren {
     appendFragment(fragment: IFragment): this;
 
     /**
-     * Insert child components at a numeric index or the index of a component reference of this
-     * component.
-     * - Insert the components as child elements to this component and
-     * - also insert the underlying Node/HTML Element of each component to the underlying HTML
+     * Insert children at a numeric index or the index of a child reference of this component.
+     * - Insert the children as child elements to this component and
+     * - also insert the underlying Node/HTML Element of each child to the underlying HTML
      *   element of this component.
      *
-     * There are no restrictions for child components, they can be newly created, mounted to another
+     * There are no restrictions for children, they can be newly created, mounted to another
      * instance of `IChildren` or mounted to this instance. This function can be used to move
      * children inside this component, e.g. `this.insert(2, this.Children[4], this.Last)`.
      *
-     * __Note:__ If `at` is a component and at the same time an element of `components` an exception
+     * __Note:__ If `at` is a child and at the same time an element of `children` an exception
      * will be thrown.
      * @param at The target index in this instance.:
      * - If `at` is lower than 0 it is considered to be 0. If `at` is greater than or equal to the
-     *   length of this collection the given components will be appended.
+     *   length of this collection the given children will be appended.
      * - If `at` is a component and does not belong to the children of this instance, nothing is
-     *   inserted, otherwise the component will be inserted at the position of `at` within this
+     *   inserted, otherwise the children will be inserted at the position of `at` within this
      *   collection.
-     * @param components The components to insert. To simplify use, each element of `components` may
-     * be `undefined` or `null`. If `components` contains multiple occurences of the same component,
-     * only the first occurence will be handled.
-     * @throws {string} `IChildren: <message>` if the component denoted by `at` is a child of
-     * `components`.
+     * @param children The children to insert. To simplify use, each element of `children` may be
+     * `undefined` or `null`. If `children` contains multiple occurences of the same child, only the
+     * first occurence will be handled.
+     * @throws {string} `IChildren: <message>` if the child denoted by `at` is a child of
+     * `children`.
      * @returns This instance.
      */
-    insert(at: number | INodeComponent<Node>, ...components: (INodeComponent<Node> | undefined | null)[]): this;
+    insert(at: number | Child, ...children: (Child | undefined | null)[]): this;
 
     /**
      * Insert components of a fragment at at numeric index or the index of a component reference of
@@ -473,76 +472,79 @@ export interface IChildren {
      * @param fragment The fragment to insert.
      * @returns This instance.
      */
-    insertFragment(at: number | INodeComponent<Node>, fragment: IFragment): this;
+    insertFragment(at: number | Child, fragment: IFragment): this;
 
     /**
-     * Remove child components from this the component. Also removes the corresponding Nodes/HTML
-     * elements from the DOM node of this component. Removed components must _not_ be disposed of.
-     * @param components The components to remove. Any element of `components` that isn't a child of
-     * this instance is ignored. To simplify use, each element of `components` may be `undefined`
-     * or `null`. If the length of `components`is `0`, _all_ components are removed. If `components`
-     * contains multiple occurences of the same component, only the first occurence will be handled.
+     * Remove children from this the component. Also removes the corresponding Nodes/HTML elements
+     * from the DOM node of this component. Removed children must _not_ be disposed of.
+     * @param children The children to remove. Any element of `children` that isn't a child of this
+     * instance is ignored. To simplify use, each element of `children` may be `undefined` or
+     * `null`. If the length of `children`is `0`, _all_ children are removed. If `children` contains
+     * multiple occurences of the same child, only the first occurence will be handled.
      * @returns This instance.
      */
-    remove(...components: (INodeComponent<Node> | undefined | null)[]): this;
+    remove(...children: (Child | undefined | null)[]): this;
 
     /**
-     * Extract child components from this the component to an array. Also removes the corresponding
+     * Extract children from this the component to an array. Also removes the corresponding
      * Nodes/HTML elements from the DOM node of this component.
-     * @param to An array to which the extracted components will be pushed.
-     * @param components The components to be extracted. Any element of `components` that isn't a
-     * child of this instance is ignored. To simplify use, each element of `components` may be
-     * `undefined` or `null`. If the length of `components` is `0`, _all_ children of this component
-     * will be extracted and pushed to `to`. If `components` contains multiple occurences of the
-     * same component, only the first occurence will be handled.
+     * @param to An array to which the extracted children will be pushed.
+     * @param children The children to be extracted. Any element of `children` that isn't a child of
+     * this instance is ignored. To simplify use, each element of `children` may be `undefined` or
+     * `null`. If the length of `children` is `0`, _all_ children of this component will be
+     * extracted and pushed to `to`. If `children` contains multiple occurences of the same child,
+     * only the first occurence will be handled.
      * @returns This instance.
      */
-    extract(to: INodeComponent<Node>[], ...components: (INodeComponent<Node> | undefined | null)[]): this;
+    extract(to: Child[], ...children: (Child | undefined | null)[]): this;
 
     /**
      * Extracts and appends child components from this the instance to another `IChildren` instance.
-     * @param target The target instance into which the components are to be inserted. If `target`
-     * is this instance, an exception will be thrown.
-     * @param components The components to be extracted and appended. Any element of `components`
-     * that isn't a child of this instance is ignored. To simplify use, each element of `components`
-     * may be `undefined` or `null`. If the length of `components` is `0`, _all_ children of this
-     * component will be extracted and appended to `target`. If `components` contains multiple
-     * occurences of the same component, only the first occurence will be handled.
+     * @param target The target instance into which the children are to be inserted. If `target` is
+     * this instance, an exception will be thrown.
+     * @param children The children to be extracted and appended. Any element of `children` that
+     * isn't a child of this instance is ignored. To simplify use, each element of `children` may be
+     * `undefined` or `null`. If the length of `children` is `0`, _all_ children of this component
+     * will be extracted and appended to `target`. If `children` contains multiple occurences of the
+     * same child, only the first occurence will be handled.
      * @throws {string} `IChildren: <message>` if `target` is `this`.
      * @returns This instance.
      */
-    moveTo(target: IChildren, ...components: (INodeComponent<Node> | undefined | null)[]): this;
+    moveTo(target: IChildren<Child>, ...children: (Child | undefined | null)[]): this;
 
     /**
      * Extracts and inserts child components from this the instance into another `IChildren`
      * instance.
-     * @param target The target instance into which the components are to be inserted. If `target`
+     * @param target The target instance into which the children are to be inserted. If `target`
      * is this instance, an exception will be thrown.
      * @param at The target index in the collection of `target`. If `at` is lower than 0 it is
-     * considered to be 0. If `at` is greater or equal to `target.length` the given components will
-     * be appended. If `at` is a component in `target` the components will be inserted at the
-     * position of `at` in `target`. If `at` is not a child of `target` an exception will be thrown.
-     * @param components The components to be moved. Any element of `components` that isn't a child
-     * of this instance is ignored. To simplify use, each element of `components` may be `undefined`
-     * or `null`. If the length of `components` is `0`, _all_ children of this component will be
-     * extracted and inserted into `target`. If `components` contains multiple occurences of the
-     * same component, only the first occurence will be handled.
+     * considered to be 0. If `at` is greater or equal to `target.length` the given children will be
+     * appended. If `at` is a child in `target` the children will be inserted at the position of
+     * `at` in `target`. If `at` is not a child of `target` an exception will be thrown.
+     * @param children The children to be moved. Any element of `children` that isn't a child of
+     * this instance is ignored. To simplify use, each element of `children` may be `undefined` or
+     * `null`. If the length of `children` is `0`, _all_ children of this component will be
+     * extracted and inserted into `target`. If `children` contains multiple occurences of the same
+     * child, only the first occurence will be handled.
      * @throws {string} `IChildren: <message>` if `target` is `this` or if `at` isn't a child of
      * `target`.
      * @returns This instance.
      */
-    moveToAt(target: IChildren, at: number | INodeComponent<Node>, ...components: (INodeComponent<Node> | undefined | null)[]): this;
+    moveToAt(target: IChildren<Child>, at: number | Child, ...children: (Child | undefined | null)[]): this;
 
     /**
      * Removes _all_ child components from this component. Also removes the corresponding Nodes/HTML
      * elements from their parent HTML elements. The removed components _must_ also be disposed of.
      * In some cases, the entire component must be considered largely unusable after this process
-     * (except for components that do not implement any functions other than the inclusion of
-     * children, such as a `Div` component).\
-     * __Important note:__ `clear()` is not only meant to handle its own children but any component
-     * that may exist besides the children collection! If, for example, the parent component has a
-     * separate/additional component tree besides the children collection, `clear()` must also
-     * remove and dispose of every component of this separate/additional tree!
+     * (with the exception of components that do not implement any functions other than embedding
+     * child elements, such as the `Div` component, for which `clear()` is a feature). It is
+     * therefore not unusual for calling `clear()` twice on the same component instance to result in
+     * unexpected behavior at the very least, and in most cases, an exception.
+     *
+     * __Important note:__ `clear()` is not only meant to handle its own children but also any
+     * component that may exist besides the children collection! If, for example, the parent
+     * component has a separate/additional component tree besides the children collection, `clear()`
+     * must also remove and dispose of every component of this separate/additional tree!
      * @returns This instance.
      */
     clear(): this;
@@ -1174,7 +1176,7 @@ export interface IElementVoidComponent<T extends HTMLElementVoid, EventMap exten
 /**
  * Base interface for HTML element based components, that *do allow* adding children.
  */
-export interface IElementWithChildrenComponent<T extends HTMLElementWithChildren, EventMap extends EventMapVoid = HTMLElementEventMap> extends IElementComponent<T, EventMap>, IChildren {
+export interface IElementWithChildrenComponent<T extends HTMLElementWithChildren, Child extends INodeComponent<Node> = INodeComponent<Node>, EventMap extends EventMapVoid = HTMLElementEventMap> extends IElementComponent<T, EventMap>, IChildren<Child> {
     /**
      * Set phrasing content of the component. This is a pure convenience setter which allows to
      * add/replace phrasing content in an easy way without having to resort to `clear()` +

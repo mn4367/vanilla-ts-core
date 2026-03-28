@@ -6,6 +6,7 @@ import {
     IChildren,
     IComponent,
     IComponentFactory,
+    IDisposable,
     IElementComponent,
     IElementVoidComponent,
     IElementWithChildrenComponent,
@@ -31,6 +32,7 @@ import {
     HTMLElementWithChildren,
     HTMLTagsWithNativeTabbing,
     InputModeAttrValues,
+    Named,
     NullableBoolean,
     NullableNumber,
     NullableString,
@@ -1105,37 +1107,148 @@ const IChildren_DOM = Symbol("IChildren_DOM");
  *   static {
  *     mixin(false, this, AChildren);
  *   }
+ *
  *   constructor() {
  *     super();
  *     this._dom = document.createElement("div");
- *     this.setChildrenDOMTarget(this._dom);
+ *     // Without parameter `setChildrenDOMTarget()` uses `this._dom` as the DOM target for its
+ *     // children by default.
+ *     this.setChildrenDOMTarget();
+ *   }
+ *
+ *   // Mandatory override if using the `AChildren` mixin!
+ *   public override dispose(): void {
+ *     // This calls `clearOwner()` (from within `AChildren` but only if it is implemented). For
+ *     // this simple container there is nothing to clean up so it's not implemented.
+ *     this.clear();
+ *     super.dispose();
  *   }
  * }
- * export interface Container extends AChildren<HTMLDivElement> { }
  *
+ * // Mix in the `IChildren` interface into the class definition.
+ * export interface Container extends IChildrenMixin { }
+ * ```
+ * @example
+ * ```typescript
+ * // The container example from above could also be made generic with regard to its children:
+ * export class Container<Child> extends AElementComponent<HTMLDivElement> {
+ *   // Implementation same as above ...
+ * }
+ * export interface Container<Child extends INodeComponent<Node>> extends IChildrenMixin<Child> { }
+ *
+ * // Usage:
+ * const pc = new Container<P>(); // Only allows `P` components as its children.
+ * p.append(new Span("Hello world!")); // TS error 2345
+ * const sc = new Container<Span>(); // Only allows `Span` components as its children.
+ * sc.append(new P("Hello world!")); // TS error 2345
+ * ```
+ * @example
+ * ```typescript
  * // Advanced container component with an 'opaque' inaccessible inner tree of components (a label
  * // and a container) that handles children. The children reside in the inner container.
  * export class LabeledContainer extends AElementComponent<HTMLDivElement> {
  *   static {
  *       mixin(false, this, AChildren);
  *   }
- *   private label: Span;
- *   private container: Div;
- *   constructor() {
+ *
+ *   #label: Span;
+ *   #container: HTMLDivElement;
+ *
+ *   constructor(label: string) {
  *     super();
  *     this._dom = document.createElement("div");
- *     this.label = new Span("Labeled container");
- *     this.container = new Div();
- *     this._dom.append(this.label.DOM, this.container.DOM);
- *     this.setChildrenDOMTarget(this.container.DOM);
+ *     this.#label = new Span(label);
+ *     this.#container = document.createElement("div");
+ *     // Set the the inner container as the DOM target for children, not `this._dom`.
+ *     this.setChildrenDOMTarget(this.#container);
+ *     this._dom.append(this.#label.DOM, this.#container);
+ *   }
+ *
+ *   // Provide access to the label.
+ *   public get Label(): Span {
+ *     return this.#label;
+ *   }
+ *
+ *   // Implement this function if using the `AChildren` mixin and there are things to clean up on
+ *   // a call of `clear()` or when the component is disposed of.
+ *   protected clearOwner(): void {
+ *     // At this point the `AChildren` mixin has disposed of the child components mounted in
+ *     // `this.container`.
+ *     // Now dispose of the label and clear the DOM of this component.
+ *     this.#label.dispose();
+ *     this._dom.replaceChildren();
+ *   }
+ *
+ *   // Mandatory override if using the `AChildren` mixin!
+ *   public override dispose(): void {
+ *     // This calls `clearOwner()` (from within `AChildren` but only if it is implemented).
+ *     this.clear();
+ *     super.dispose();
  *   }
  * }
- * export interface LabeledContainer extends AChildren<HTMLDivElement> { }
+ *
+ * // Mix in the `IChildren` interface into the class definition.
+ * export interface LabeledContainer extends IChildrenMixin { }
+ * ```
+ * @example
+ * ```typescript
+ * // `AChildren can be used with the class `AElementComponentWithInternalUI` as well. Although
+ * // there is nothing wrong with the `LabeledContainer` example above this is the preferred way to
+ * // build components with an inner tree of components/user interface.
+ * export class LabeledContainer extends AElementComponentWithInternalUI<Div> {
+ *   static {
+ *     mixin(false, this, AChildren);
+ *   }
+ *
+ *   #label: Span;
+ *
+ *   constructor(label: string) {
+ *     super();
+ *     this.initialize(undefined, label);
+ *   }
+ *
+ *   // Provide access to the label.
+ *   public get Label(): Span {
+ *     return this.#label;
+ *   }
+ *
+ *   // Show/hide the label by inserting/removing it.
+ *   public showLabel(show: boolean) {
+ *     show ? this.ui.insert(0, this.#label) : this.ui.remove(this.#label);
+ *   }
+ *
+ *   // Override this function if using the `AChildren` mixin and there are things to clean up on
+ *   // a call of `clear()` or when the component is disposed of.
+ *   protected override clearOwner(): void {
+ *     // At this point the `AChildren` mixin has disposed of the child components mounted in
+ *     // `this.ui` (only those managed by `AChildren`, the label isn't part of it).
+ *     // Now dispose of the label if it isn't mounted.
+ *     this.ui.contains(this.#label) || this.#label.dispose();
+ *     // When using `AElementComponentWithInternalUI`, `super.clearOwner()` must be called here!!
+ *     super.clearOwner();
+ *   }
+ *
+ *   protected override buildUI(label: string): this {
+ *     this.ui = new Div().append(this.#label = new Span(label));
+ *     this.setChildrenDOMTarget(this.ui.DOM);
+ *     return this;
+ *   }
+ *
+ *   // Overriding `dispose()` is only necessary if there are things besides to components to clean
+ *   // up when the component is disposed of; rarely necessary.
+ *   // public override dispose(): void {
+ *   //     // Remove event listeners, destroy observers etc.
+ *   //     super.dispose();
+ *   // }
+ * }
+ * // Mix in the `IChildren` interface into the class definition (here again using generics but this
+ * // time less strict with a default type).
+ * export interface LabeledContainer<Child extends INodeComponent<Node> = INodeComponent<Node>> extends IChildrenMixin<Child> { }
  * ```
  */
-export abstract class AChildren<T extends HTMLElementWithChildren, EventMap extends EventMapVoid = HTMLElementEventMap> extends ANodeComponent<T, EventMap> implements IChildren {
+export abstract class AChildren<T extends HTMLElementWithChildren, Child extends INodeComponent<Node>> extends ANodeComponent<T> implements IChildren<Child> {
     /** Contains the child components of this component. */
-    [IChildren_Children]: INodeComponent<Node>[];
+    [IChildren_Children]: Child[];
     /**
      * The DOM element which contains the DOM elements of the child components. Will/must be
      * assigned once by calling `setChildrenDOMTarget()`.
@@ -1146,7 +1259,7 @@ export abstract class AChildren<T extends HTMLElementWithChildren, EventMap exte
      * Sets the DOM element on which `AChildren` operates. _Must_ be called by classes that use
      * `AChildren` as a mixin as soon as that DOM element is available.
      * @param domTarget The DOM element that `AChildren` operates on. By default this is `this._dom`
-     * but it can be set any other DOM element the component holds/controls.
+     * but it can be set to any other DOM element the component holds/controls.
      */
     public setChildrenDOMTarget(domTarget?: T): void {
         if (this[IChildren_DOM]) {
@@ -1157,31 +1270,32 @@ export abstract class AChildren<T extends HTMLElementWithChildren, EventMap exte
     }
 
     /** @inheritdoc */
-    public get Children(): INodeComponent<Node>[] {
+    public get Children(): Child[] {
         return this[IChildren_Children].slice();
     }
 
     /** @inheritdoc */
     public get ElementChildren(): IIsElementComponent[] {
+        // @ts-expect-error ---
         return this[IChildren_Children].filter(
             child => child.ComponentType === ComponentType.ELEMENT_WITH_CHILDREN || child.ComponentType === ComponentType.ELEMENT
         ) as IIsElementComponent[];
     }
 
     /** @inheritdoc */
-    public get First(): INodeComponent<Node> | undefined {
+    public get First(): Child | undefined {
         return this[IChildren_Children][0];
     }
 
     /** @inheritdoc */
-    public get Last(): INodeComponent<Node> | undefined {
+    public get Last(): Child | undefined {
         return this[IChildren_Children].at(-1);
     }
 
     /** @inheritdoc */
-    public append(...components: (INodeComponent<Node> | undefined | null)[]): this {
+    public append(...children: (Child | undefined | null)[]): this {
         // Avoid multiple unnecessary `remove`/`onBeforeMount`/`onDidMount` operations.
-        const uniques = new Set(components.filter(e => e ?? e)) as Set<INodeComponent<Node>>;
+        const uniques = new Set(children.filter(e => e ?? e)) as Set<Child>;
         if (uniques.size === 0) {
             return this;
         }
@@ -1189,7 +1303,7 @@ export abstract class AChildren<T extends HTMLElementWithChildren, EventMap exte
          * It's unknown where the given components are possibly mounted so first remove them. This
          * is done groupwise (with regard to the parents of the components).
          */
-        const parents: Map<IElementWithChildrenComponent<HTMLElementWithChildren>, INodeComponent<Node>[]> = new Map();
+        const parents: Map<IElementWithChildrenComponent<HTMLElementWithChildren>, Child[]> = new Map();
         for (const component of uniques) {
             const parent = component.Parent;
             if (parent) {
@@ -1224,7 +1338,7 @@ export abstract class AChildren<T extends HTMLElementWithChildren, EventMap exte
         for (const component of Children) {
             component.onBeforeMount(<IElementWithChildrenComponent<T>><unknown>this);
         }
-        this[IChildren_Children].push(...Children);
+        this[IChildren_Children].push(...Children as Child[]);
         this[IChildren_DOM].appendChild(Fragment);
         for (const component of Children) {
             component.onDidMount(<IElementWithChildrenComponent<T>><unknown>this);
@@ -1233,13 +1347,13 @@ export abstract class AChildren<T extends HTMLElementWithChildren, EventMap exte
     }
 
     /** @inheritdoc */
-    public insert(at: number | INodeComponent<Node>, ...components: (INodeComponent<Node> | undefined | null)[]): this {
+    public insert(at: number | Child, ...children: (Child | undefined | null)[]): this {
         // Avoid multiple unnecessary `remove`/`onBeforeMount`/`onDidMount` operations.
-        const uniques = new Set(components.filter(e => e ?? e)) as Set<INodeComponent<Node>>;
+        const uniques = new Set(children.filter(e => e ?? e)) as Set<Child>;
         if (uniques.size === 0) {
             return this;
         }
-        let insertBefore: INodeComponent<Node>;
+        let insertBefore: Child;
         if (typeof at === "number") {
             if (at < 0) {
                 insertBefore = this[IChildren_Children][0];
@@ -1268,7 +1382,7 @@ export abstract class AChildren<T extends HTMLElementWithChildren, EventMap exte
          * It's unknown where the given components are possibly mounted so first remove them. This
          * is done groupwise (with regard to the parents of the components).
          */
-        const parents: Map<IElementWithChildrenComponent<HTMLElementWithChildren>, INodeComponent<Node>[]> = new Map();
+        const parents: Map<IElementWithChildrenComponent<HTMLElementWithChildren>, Child[]> = new Map();
         for (const component of uniques) {
             const parent = component.Parent;
             if (parent) {
@@ -1295,7 +1409,7 @@ export abstract class AChildren<T extends HTMLElementWithChildren, EventMap exte
     }
 
     /** @inheritdoc */
-    public insertFragment(at: number | INodeComponent<Node>, fragment: IFragment): this {
+    public insertFragment(at: number | Child, fragment: IFragment): this {
         if (fragment.Children.length === 0) {
             return this;
         }
@@ -1318,7 +1432,7 @@ export abstract class AChildren<T extends HTMLElementWithChildren, EventMap exte
             component.onBeforeMount(<IElementWithChildrenComponent<T>><unknown>this);
         }
         const insertBefore = this[IChildren_Children][index];
-        this[IChildren_Children].splice(index, 0, ...Children);
+        this[IChildren_Children].splice(index, 0, ...Children as Child[]);
         this[IChildren_DOM].insertBefore(Fragment, insertBefore.DOM);
         for (const component of Children) {
             component.onDidMount(<IElementWithChildrenComponent<T>><unknown>this);
@@ -1327,8 +1441,8 @@ export abstract class AChildren<T extends HTMLElementWithChildren, EventMap exte
     }
 
     /** @inheritdoc */
-    public remove(...components: (INodeComponent<Node> | undefined | null)[]): this {
-        if (components.length === 0) {
+    public remove(...children: (Child | undefined | null)[]): this {
+        if (children.length === 0) {
             // Allow children to inspect their parent tree before actually removing them from the DOM.
             for (const component of this[IChildren_Children]) {
                 component.onBeforeUnmount();
@@ -1341,7 +1455,7 @@ export abstract class AChildren<T extends HTMLElementWithChildren, EventMap exte
             }
         } else {
             // Avoid multiple unnecessary `remove`/`onBeforeMount`/`onDidMount` operations.
-            const uniques = new Set(components.filter(e => e ?? e)) as Set<INodeComponent<Node>>;
+            const uniques = new Set(children.filter(e => e ?? e)) as Set<Child>;
             // Allow children to inspect their parent tree before actually removing them from the DOM.
             for (const component of uniques) {
                 if (component.isContainedIn(<IElementComponent<T>><unknown>this)) {
@@ -1361,9 +1475,9 @@ export abstract class AChildren<T extends HTMLElementWithChildren, EventMap exte
     }
 
     /** @inheritdoc */
-    public extract(to: INodeComponent<Node>[], ...components: (INodeComponent<Node> | undefined | null)[]): this {
+    public extract(to: INodeComponent<Node>[], ...children: (Child | undefined | null)[]): this {
         // Empty this component.
-        if (components.length === 0) {
+        if (children.length === 0) {
             // Allow children to inspect their parent tree before actually removing them from the DOM.
             for (const component of this[IChildren_Children]) {
                 component.onBeforeUnmount();
@@ -1380,7 +1494,7 @@ export abstract class AChildren<T extends HTMLElementWithChildren, EventMap exte
             return this;
         }
         // Avoid multiple unnecessary `remove`/`onBeforeMount`/`onDidMount` operations.
-        const uniques = new Set(components.filter(e => e ?? e)) as Set<INodeComponent<Node>>;
+        const uniques = new Set(children.filter(e => e ?? e)) as Set<Child>;
         // Regular extract of only some components.
         // Allow children to inspect their parent tree before actually removing them from the DOM.
         for (const component of uniques) {
@@ -1400,18 +1514,18 @@ export abstract class AChildren<T extends HTMLElementWithChildren, EventMap exte
     }
 
     /** @inheritdoc */
-    public moveTo(target: IChildren, ...components: (INodeComponent<Node> | undefined | null)[]): this {
+    public moveTo(target: IChildren, ...children: (Child | undefined | null)[]): this {
         if (target === this) {
             throw new Error("IChildren: 'moveTo()' isn't supported inside IChildren.");
         }
         const extracted: INodeComponent<Node>[] = [];
-        this.extract(extracted, ...components);
+        this.extract(extracted, ...children);
         target.append(...extracted);
         return this;
     }
 
     /** @inheritdoc */
-    public moveToAt(target: IChildren, at: number | INodeComponent<Node>, ...components: (INodeComponent<Node> | undefined | null)[]): this {
+    public moveToAt(target: IChildren, at: number | Child, ...children: (Child | undefined | null)[]): this {
         if (target === this) {
             throw new Error("IChildren: 'moveToAt()' isn't supported inside IChildren.");
         }
@@ -1419,7 +1533,7 @@ export abstract class AChildren<T extends HTMLElementWithChildren, EventMap exte
             throw new Error("IChildren: param 'at' for 'moveToAt()' isn't a child of 'target'.");
         }
         const extracted: INodeComponent<Node>[] = [];
-        this.extract(extracted, ...components);
+        this.extract(extracted, ...children);
         target.insert(at, ...extracted);
         return this;
     }
@@ -1456,13 +1570,18 @@ export abstract class AChildren<T extends HTMLElementWithChildren, EventMap exte
         return this;
     }
 }
+
+/** Interface is to be used for augmenting classes where the `AChildren` mixin has been applied. */
+export interface IChildrenMixin<Child extends INodeComponent<Node> = INodeComponent<Node>> extends
+    IChildren<Child>,
+    Named<{ setChildrenDOMTarget: (target?: HTMLElement) => void; }> { } // eslint-disable-line jsdoc/require-jsdoc
 // #endregion AChildren
 /////////////////////////////
 
 /**
  * Abstract base implementation of a component, *that does allow* adding child components.
  */
-export abstract class AElementComponentWithChildren<T extends HTMLElementWithChildren, EventMap extends EventMapVoid = HTMLElementEventMap> extends AElementComponent<T, EventMap> implements IElementWithChildrenComponent<T, EventMap> { // eslint-disable-line @typescript-eslint/no-unsafe-declaration-merging
+export abstract class AElementComponentWithChildren<T extends HTMLElementWithChildren, Child extends INodeComponent<Node> = INodeComponent<Node>, EventMap extends EventMapVoid = HTMLElementEventMap> extends AElementComponent<T, EventMap> implements IElementWithChildrenComponent<T, Child, EventMap> { // eslint-disable-line @typescript-eslint/no-unsafe-declaration-merging
     /**
      * Inner helper class for creating DOM text node components without relying on a similar
      * component available elsewhere (e.g. `Text` class exported from `@vanilla-ts/dom/Text.ts`).
@@ -1512,7 +1631,7 @@ export abstract class AElementComponentWithChildren<T extends HTMLElementWithChi
             /** Propagate the new `Disabled` state to all children. */
             for (const child of this.Children) {
                 if (child.ComponentType === ComponentType.ELEMENT_WITH_CHILDREN || child.ComponentType === ComponentType.ELEMENT) {
-                    (<IIsElementComponent>child).parentDisabled(this._disabled);
+                    (<IIsElementComponent><unknown>child).parentDisabled(this._disabled);
                 }
             }
         }
@@ -1534,7 +1653,7 @@ export abstract class AElementComponentWithChildren<T extends HTMLElementWithChi
             /** Otherwise propagate the new `Disabled` state to all children. */
             for (const child of this.Children) {
                 if (child.ComponentType === ComponentType.ELEMENT_WITH_CHILDREN || child.ComponentType === ComponentType.ELEMENT) {
-                    (<IIsElementComponent>child).parentDisabled(this._parentDisabled);
+                    (<IIsElementComponent><unknown>child).parentDisabled(this._parentDisabled);
                 }
             }
         }
@@ -1557,7 +1676,7 @@ export abstract class AElementComponentWithChildren<T extends HTMLElementWithChi
         this.clear();
         phrase.length === 1 && typeof phrase[0] === "string"
             ? this._dom.textContent = phrase[0]
-            : this.append(...phrase.map(e => typeof e === "string" ? new AElementComponentWithChildren.#DOMTextNode_(e) : e));
+            : this.append(...phrase.map(e => <Child><unknown>(typeof e === "string" ? new AElementComponentWithChildren.#DOMTextNode_(e) : e)));
         return this;
     }
 
@@ -1604,7 +1723,7 @@ export abstract class AElementComponentWithChildren<T extends HTMLElementWithChi
 }
 
 // Augment class definition with `IChildren/AChildren` (see `static`).
-export interface AElementComponentWithChildren<T extends HTMLElementWithChildren, EventMap extends EventMapVoid = HTMLElementEventMap> extends AChildren<T, EventMap> { } // eslint-disable-line jsdoc/require-jsdoc,@typescript-eslint/no-empty-object-type
+export interface AElementComponentWithChildren<T extends HTMLElementWithChildren, Child extends INodeComponent<Node> = INodeComponent<Node>> extends IChildrenMixin<Child> { } // eslint-disable-line jsdoc/require-jsdoc,@typescript-eslint/no-unused-vars,@typescript-eslint/no-empty-object-type
 
 /**
  * Abstract base class for creating components that manage their own component tree/user interface

@@ -1254,7 +1254,7 @@ export abstract class SelectionEndProp<T extends HTMLInputElement | HTMLTextArea
  * __Note:__ This class is part of `@vanilla-ts/core` and not of `@vanilla-ts/dom` because it is
  * used in the {@link DataListAttr} DOM property (to avoid cyclic package dependencies).
  */
-export class Option<EventMap extends HTMLElementEventMap = HTMLElementEventMap> extends ElementComponentWithChildren<HTMLOptionElement, EventMap> { // eslint-disable-line @typescript-eslint/no-unsafe-declaration-merging
+export class Option<Child extends INodeComponent<Node> = INodeComponent<Node>, EventMap extends HTMLElementEventMap = HTMLElementEventMap> extends ElementComponentWithChildren<HTMLOptionElement, Child, EventMap> { // eslint-disable-line @typescript-eslint/no-unsafe-declaration-merging
     /**
      * Create Option component.
      * @param phrase The phrasing content for the `<option>` element. Due to the limited styling
@@ -1301,7 +1301,7 @@ export class Option<EventMap extends HTMLElementEventMap = HTMLElementEventMap> 
 
 // Augment class definition with the DOM attributes/properties introduced by `mixinDOMProperties()`
 // above.
-export interface Option<EventMap extends HTMLElementEventMap = HTMLElementEventMap> extends // eslint-disable-line jsdoc/require-jsdoc
+export interface Option<Child extends INodeComponent<Node> = INodeComponent<Node>, EventMap extends HTMLElementEventMap = HTMLElementEventMap> extends // eslint-disable-line jsdoc/require-jsdoc,@typescript-eslint/no-unused-vars
     LabelAttr<HTMLOptionElement, EventMap>,
     ValueAttr<HTMLOptionElement, EventMap>,
     NativeDisabledAttr<HTMLOptionElement, EventMap> { }
