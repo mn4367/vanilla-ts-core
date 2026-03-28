@@ -1674,6 +1674,7 @@ export abstract class AElementComponentWithInternalUI<UI extends (IElementCompon
     protected ui: UI;
     #mountUI: boolean;
     #initialized = false;
+    #disposing: boolean = false;
 
     /** @inheritdoc */
     public override text(_text: NullableString): this {
@@ -1833,13 +1834,7 @@ export abstract class AElementComponentWithInternalUI<UI extends (IElementCompon
         if (!this.#initialized) {
             throw new Error("'clear()'/'clearOwner()' can only be called once after 'initialize()'.");
         }
-        if (this.#mountUI) {
-            this.ui.onBeforeUnmount();
-            this.ui.clear();
-            this.ui.onDidUnmount();
-        } else {
-            this.ui.clear();
-        }
+        this.#disposing || this.ui.clear();
     }
 
     /**
@@ -1863,8 +1858,18 @@ export abstract class AElementComponentWithInternalUI<UI extends (IElementCompon
 
     /** @inheritdoc */
     public override dispose(): void {
-        this.clear();
-        super.dispose();
+        this.#disposing = true;
+        try {
+            this.clear();
+            if (this.#mountUI) {
+                this.ui.onBeforeUnmount();
+                this.ui.onDidUnmount();
+            }
+            this.ui.dispose();
+            super.dispose();
+        } finally {
+            this.#disposing = false;
+        }
     }
 }
 
