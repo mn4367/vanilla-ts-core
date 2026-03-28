@@ -198,6 +198,8 @@ export function mixinComponentFactories<
 // #endregion
 //////////////////////////////
 
+//////////////////////////////
+// #region DOM
 /**
  * Constant that holds the current status of the various modifier keys.
  */
@@ -318,17 +320,6 @@ export function tabKeyFocusCycle(elem: HTMLElement, ev: KeyboardEvent, preventPr
 }
 
 /**
- * Converts a string to a kebap case string.
- * @param s The string to be converted.
- * @returns A kebap case string.
- * @see https://developer.mozilla.org/en-US/docs/Glossary/Kebab_case
- * @see https://stackoverflow.com/a/67243723
- */
-export function toKebapCase(s: string): string {
-    return s.replace(/[A-Z]+(?![a-z])|[A-Z]/g, (c, o) => (o ? "-" : "") + c.toLowerCase());
-}
-
-/**
  * Get a rectangle (`DOMRect`) that contains the position and size of an HTML element The position
  * is calculated relative to the parent element of `elem`. The size includes the border width and
  * padding of `elem`.
@@ -345,6 +336,53 @@ export function getClientRect(elem: HTMLElement): DOMRect {
         elem.offsetWidth,
         elem.offsetHeight
     );
+}
+
+/**
+ * Checks whether the coordinates of a point lie within a rectangle. 'Within' is also fulfilled if
+ * the point lies exactly on one edge or two edges of the rectangle.
+ * @param rect The rectangle.
+ * @param point The point.
+ * @returns `true`, if `point` is inside `rect`, otherwise `false`.
+ */
+export function rectContains(rect: DOMRect, point: DOMPoint): boolean {
+    return (point.x >= rect.left)
+        && (point.y >= rect.top)
+        && (point.x <= rect.right)
+        && (point.y <= rect.bottom);
+}
+// #endregion
+//////////////////////////////
+
+//////////////////////////////
+// #region Misc
+/**
+ * Converts a string to a kebap case string.
+ * @param s The string to be converted.
+ * @returns A kebap case string.
+ * @see https://developer.mozilla.org/en-US/docs/Glossary/Kebab_case
+ * @see https://stackoverflow.com/a/67243723
+ */
+export function toKebapCase(s: string): string {
+    return s.replace(/[A-Z]+(?![a-z])|[A-Z]/g, (c, o) => (o ? "-" : "") + c.toLowerCase());
+}
+
+/**
+ * Checks a value against the boundaries of `boundary1` and `boundary2`.
+ * @param n The value to check against the boundaries given by `boundary1` and `boundary2`.
+ * @param boundary1 One end of the range to check against.
+ * @param boundary2 The other end of the range to check against.
+ * @returns `n`, if `n` is equal to `boundary1` or `boundary2` or lies between `boundary1` and
+ * `boundary2` or the boundary which is nearest to `n` (`boundary1` or `boundary2`).\
+ * __Note:__ Contrary to https://github.com/tc39/proposal-math-clamp?tab=readme-ov-file#examples
+ * this implementation does not throw a `RangeError` if `boundary1` is greater than `boundary2`!
+ */
+export function clamp(n: number, boundary1: number, boundary2: number): number {
+    return boundary1 === boundary2
+        ? boundary1
+        : boundary1 < boundary2
+            ? Math.max(Math.min(n, boundary2), boundary1)
+            : Math.max(Math.min(n, boundary1), boundary2);
 }
 
 /**
@@ -480,7 +518,6 @@ export const cid = (): string => {
     return "_" + Math.floor(Math.random() * 2176782336 /* 36 ** 6 */).toString(36).padStart(6, "0");
 };
 
-
 /**
  * Checks if an object has a property with the value `undefined`.
  * @param obj The object to be checked.
@@ -550,3 +587,5 @@ export function getProp<T extends Record<string | number | symbol, AnyType>, K e
         ? def
         : from[prop] ?? ref[prop] ?? def;
 }
+// #endregion
+//////////////////////////////
