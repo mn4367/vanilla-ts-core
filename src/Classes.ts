@@ -1095,11 +1095,11 @@ const IChildren_DOM = Symbol("IChildren_DOM");
  * be mixed into a target class that needs to implement/use `IChildren`. The target class _must_
  * call `setChildrenDOMTarget()` as soon as the DOM element that the mixin refers to is available!
  * Additionally the class interface _must_ be augmented with `AChildren<...>`!
+ *
+ * Instances of the classes from all the examples below expose all functions like `append()`,
+ * `remove()` etc. from `IChildren`.
  * @example
  * ```typescript
- * // Instances of both classes below expose all functions like `append()`, `remove()` etc. from
- * // IChildren.
- *
  * // Simple container component that handles children.
  * export class Container extends AElementComponent<HTMLDivElement> {
  *   static {
@@ -1588,7 +1588,15 @@ export abstract class AElementComponentWithChildren<T extends HTMLElementWithChi
         this._dom.replaceChildren();
     }
 
-    /** @inheritdoc */
+    /**
+     * \
+     * \
+     * __Note:__ `this.clear()` in the implementation below calls the `clear()` function of the
+     * `AChildren` mixin which itself first disposes of all child components and then calls
+     * `this.clearOwner()`. So `this.clearOwner()` is the right place to further clear things up in
+     * this component instance.
+     * @inheritdoc
+     */
     public override dispose(): void {
         this.clear();
         super.dispose();
@@ -1613,7 +1621,7 @@ export interface AElementComponentWithChildren<T extends HTMLElementWithChildren
  * However, if the component should expose the functionality of `IChildren` to make it look like
  * a component of type `AElementComponentWithChildren` an implementation of `AChildren` that works
  * on an inner component this can easily be mixed in, see, for example, the implementation of
- * `LabeledContainer` in `@vanilla-ts/components`.\
+ * `LabeledContainer` in `@vanilla-ts/components` or the documentation of `AChildren`.\
  * For components with their own 'opaque' user interface like the one described above,
  * `AElementComponentWithInternalUI` is preferable as the base class. It allows to build an inner
  * user interface that isn't accessible from outside the component. Another advantage of using
@@ -1643,6 +1651,10 @@ export interface AElementComponentWithChildren<T extends HTMLElementWithChildren
  *       new Button("-").on("click", () => this.step(-1)),
  *     );
  *     return this;
+ *   }
+ *
+ *   public get Value(): number {
+ *     return this.start;
  *   }
  *
  *   public step(amount: number): void {
