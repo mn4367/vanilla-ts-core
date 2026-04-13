@@ -44,7 +44,7 @@ import {
 import {
     mixin,
     mixinDOMProperties,
-    toKebapCase
+    toKebabCase
 } from "./Utils.js";
 
 
@@ -753,7 +753,7 @@ export abstract class AElementComponent<T extends (HTMLElementWithChildren | HTM
 
     /** @see Instance property {@link AElementComponent.DefaultCSSClassName}. */
     public static get DefaultCSSClassName(): string {
-        return (<Record<string, AnyType>>this)["__ccn__" + this.name] ?? ((<Record<string, AnyType>>this)["__ccn__" + this.name] = toKebapCase(this.name)); // eslint-disable-line @typescript-eslint/no-unsafe-return
+        return (<Record<string, AnyType>>this)["__ccn__" + this.name] ?? ((<Record<string, AnyType>>this)["__ccn__" + this.name] = toKebabCase(this.name)); // eslint-disable-line @typescript-eslint/no-unsafe-return
     }
 
     /** The internal flag holding the disabled state of the element. */
@@ -1030,17 +1030,17 @@ export abstract class AElementComponent<T extends (HTMLElementWithChildren | HTM
     public style(property: CSSPropertyNames | CSSStyleDeclarations, v?: NullableString, important?: boolean): this {
         if (typeof property === "string") {
             v
-                ? this._dom.style.setProperty(toKebapCase(property), v, important ? "important" : undefined)
-                : this._dom.style.removeProperty(toKebapCase(property));
+                ? this._dom.style.setProperty(toKebabCase(property), v, important ? "important" : undefined)
+                : this._dom.style.removeProperty(toKebabCase(property));
             return this;
         }
         for (const prop in property) {
             const v = (property[prop as CSSPropertyNames] ?? "").trimEnd();
             if (v === "") {
-                this._dom.style.removeProperty(toKebapCase(prop));
+                this._dom.style.removeProperty(toKebabCase(prop));
             } else {
                 const important = v.endsWith("!");
-                this._dom.style.setProperty(toKebapCase(prop), important ? v.slice(0, -1) : v, important ? "important" : undefined);
+                this._dom.style.setProperty(toKebabCase(prop), important ? v.slice(0, -1) : v, important ? "important" : undefined);
             }
         }
         return this;

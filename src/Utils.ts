@@ -363,7 +363,7 @@ export function rectContains(rect: DOMRect, point: DOMPoint): boolean {
  * @see https://developer.mozilla.org/en-US/docs/Glossary/Kebab_case
  * @see https://stackoverflow.com/a/67243723
  */
-export function toKebapCase(s: string): string {
+export function toKebabCase(s: string): string {
     return s.replace(/[A-Z]+(?![a-z])|[A-Z]/g, (c, o) => (o ? "-" : "") + c.toLowerCase());
 }
 

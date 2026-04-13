@@ -21,7 +21,7 @@ import {
     HTMLElementWithChildren,
     HTMLElementWithChildrenTagName
 } from "./Types.js";
-import { mixin, toKebapCase } from "./Utils.js";
+import { mixin, toKebabCase } from "./Utils.js";
 
 
 /**
@@ -180,6 +180,7 @@ export class ComponentFactory<T extends IComponent> extends AComponentFactory<T>
  */
 export class CSSClassNameFactory extends ComponentFactory<IComponent> {
     #cssPrefix: string;
+    #prefix: string;
     #recursive: boolean;
 
     /**
@@ -190,7 +191,7 @@ export class CSSClassNameFactory extends ComponentFactory<IComponent> {
      */
     constructor(cssPrefix: string = "", recursive: boolean = false) {
         super();
-        this.#cssPrefix = cssPrefix;
+        this.cssPrefix(cssPrefix);
         this.#recursive = recursive;
     }
 
@@ -223,7 +224,7 @@ export class CSSClassNameFactory extends ComponentFactory<IComponent> {
     }
 
     /**
-     * Get/set the current prefix for CSS class names.
+     * Get/set the current prefix for CSS class names (auto-trimmed string).
      */
     public get CSSPrefix(): string {
         return this.#cssPrefix;
@@ -234,12 +235,13 @@ export class CSSClassNameFactory extends ComponentFactory<IComponent> {
     }
 
     /**
-     * Set the current prefix for CSS class names.
+     * Set the current prefix for CSS class names (auto-trimmed string).
      * @param v The current prefix for CSS class names.
      * @returns This instance.
      */
     public cssPrefix(v: string): this {
-        this.#cssPrefix = v;
+        this.#cssPrefix = v.trim();
+        this.#prefix = this.#cssPrefix ? this.#cssPrefix + "-" : "";
         return this;
     }
 
@@ -271,8 +273,8 @@ export class CSSClassNameFactory extends ComponentFactory<IComponent> {
      * @param _data Arbitrary data to be possibly evaluated.
      */
     private addClassNames(component: IIsElementComponent, _data?: AnyType) {
-        component.addClass(`${this.#cssPrefix}-${toKebapCase(component.constructor.name)}`);
-        // component.addClass(`${this.#cssPrefix}-${component.DefaultCSSClassName}`);
+        component.addClass(`${this.#prefix}${toKebabCase(component.constructor.name)}`);
+        // component.addClass(`${this.#prefix}${component.DefaultCSSClassName}`);
         // if (typeof data === ...) {
         //     ...
         // }
