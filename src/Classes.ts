@@ -903,6 +903,11 @@ export abstract class AElementComponent<T extends (HTMLElementWithChildren | HTM
     }
 
     /** @inheritdoc */
+    public get Dataset(): DOMStringMap {
+        return this._dom.dataset;
+    }
+
+    /** @inheritdoc */
     public get Disabled(): boolean {
         return this._disabled;
     }

@@ -1026,6 +1026,13 @@ export interface IElementComponent<T extends HTMLElement, EventMap extends Event
     data(name: string, value: NullableString): this;
 
     /**
+     * The `dataset` property of the underlying HTML element.
+     * @returns A `DOMStringMap`.
+     * @see https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/dataset
+     */
+    Dataset: DOMStringMap;
+
+    /**
      * Getter/setter for the appearance and behavior of a component in relation to an
      * activated/deactivated state.
      *
