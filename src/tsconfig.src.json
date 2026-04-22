@@ -1,11 +1,12 @@
 {
-    "extends": "../tsconfig.json",
-    "compilerOptions": {
-        "declaration": true,
-        "outDir": "../lib",
-        "declarationDir": "../types",
-    },
-    "include": [
-        "./**/*.ts",
-    ]
+  "extends": "../tsconfig.json",
+  "compilerOptions": {
+    "declaration": true,
+    "outDir": "../lib",
+    "declarationDir": "../types",
+    "rootDir": "./",
+  },
+  "include": [
+    "./**/*.ts",
+  ]
 }

@@ -247,14 +247,14 @@ export interface IGlobalDOMAttributes {
     /**
      * Get/set `nonce` attribute value of the component.
      */
-    Nonce: string | undefined;
+    Nonce: NullableString;
 
     /**
      * Set `nonce` attribute value of the component.
-     * @param v The value to be set.
+     * @param v The value to be set. Setting `null` will set the attribute to an empty string.
      * @returns This instance.
      */
-    nonce(v: string | undefined): this;
+    nonce(v: NullableString): this;
 
     /**
      * Get/set `popover` attribute value of the component.

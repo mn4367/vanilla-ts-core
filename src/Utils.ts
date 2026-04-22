@@ -583,7 +583,7 @@ export function setProp<T extends Record<string | number | symbol, AnyType>, K e
  * @returns A value depending on the content of `from` and `ref` as described above.
  */
 export function getProp<T extends Record<string | number | symbol, AnyType>, K extends keyof T>(from: T, ref: T, prop: K, def: Exclude<T[K], undefined>): Exclude<T[K], undefined> {
-    return isUndefined(from, prop) // eslint-disable-line @typescript-eslint/no-unsafe-return
+    return isUndefined(from, prop)
         ? def
         : from[prop] ?? ref[prop] ?? def;
 }

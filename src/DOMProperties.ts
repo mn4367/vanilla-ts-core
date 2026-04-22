@@ -105,7 +105,7 @@ export abstract class AutocompleteAttr<T extends HTMLElementWithAutocomplete, Ev
      * strings and `null`. `null` or an empty string removes the attribute.
      */
     public get Autocomplete(): AutocompleteAttributeValues {
-        return <AutocompleteAttributeValues>this._dom.autocomplete;
+        return this._dom.autocomplete;
     }
     /** @inheritdoc */
     public set Autocomplete(v: AutocompleteAttributeValues) {
@@ -462,7 +462,7 @@ export abstract class LoadingAttr<T extends HTMLElementWithLoading, EventMap ext
      * and `null`. `null` or an empty string removes the attribute.
      */
     public get Loading(): LoadingAttributeValues {
-        return <LoadingAttributeValues>this._dom.loading;
+        return this._dom.loading;
     }
     /** @inheritdoc */
     public set Loading(v: LoadingAttributeValues) {

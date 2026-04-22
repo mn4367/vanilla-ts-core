@@ -6,7 +6,7 @@ import {
     IChildren,
     IComponent,
     IComponentFactory,
-    IDisposable,
+    IDisposable, // eslint-disable-line @typescript-eslint/no-unused-vars
     IElementComponent,
     IElementVoidComponent,
     IElementWithChildrenComponent,
@@ -621,17 +621,19 @@ export abstract class AGlobalDOMAttributes<T extends HTMLElement, EventMap exten
     }
 
     /** @inheritdoc */
-    public get Nonce(): string | undefined {
+    public get Nonce(): NullableString {
         return this._dom.nonce;
     }
     /** @inheritdoc */
-    public set Nonce(v: string | undefined) {
-        this._dom.nonce = v;
+    public set Nonce(v: NullableString) {
+        this.nonce(v);
     }
 
     /** @inheritdoc */
-    public nonce(v: string | undefined): this {
-        this._dom.nonce = v;
+    public nonce(v: NullableString): this {
+        this._dom.nonce = v
+            ? v
+            : "";
         return this;
     }
 
