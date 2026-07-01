@@ -351,6 +351,18 @@ export function rectContains(rect: DOMRect, point: DOMPoint): boolean {
         && (point.x <= rect.right)
         && (point.y <= rect.bottom);
 }
+
+/**
+ * A function that returns a string starting with `_` followed by six random alphanumeric
+ * characters. The intended use case is to create unique IDs for HTML elements. The characters are
+ * chosen out of the range `0` to `9` and `a` to `z` so a result could be `_j9e20f`. This function
+ * is also used internally for generating IDs for components where an ID is needed/recommended but
+ * not explicitly provided.
+ * @returns A string starting with `_` followed by six random alphanumeric characters.
+ */
+export const cid = (): string => {
+    return "_" + Math.floor(Math.random() * 2176782336 /* 36 ** 6 */).toString(36).padStart(6, "0");
+};
 // #endregion
 //////////////////////////////
 
@@ -385,6 +397,104 @@ export function clamp(n: number, boundary1: number, boundary2: number): number {
             : Math.max(Math.min(n, boundary1), boundary2);
 }
 
+/**
+ * Parses comma separated integer range definitions into a list of integers.
+ * @param value The range definition string. Examples:
+ * - "3-5" => 3,4,5
+ * - "3-" => 3,4,5,...,max
+ * - "-3" => start,start+1,...,3 ('open-start range', where `start` is either `0` or `1`, see below)
+ * - "3" => 3
+ * - "3-5,7,9-11" => 3,4,5,7,9,10,11
+ * - "3 - 5, 7 , 9 -11 " => 3,4,5,7,9,10,11 (whitespace in the definition string is ignored)
+ * - "" => start,start+1,...,max (an empty string results in a range from `start` to `max`,
+ *   whitespace is ignored)
+ * - "-" => max,...,start+1,start (a single dash results in a range from `max` to `start`,
+ *   whitespace is ignored)
+ * @param max The maximum allowed value. Must be greater than `0`. Values greater than `max` are
+ * ignored. The function does not check for ranges that may fall out of the limit of the maximum
+ * number of entries in an array. In such cases an unhandled exception will be thrown by the
+ * JavaScript engine.
+ * @param start The start value for open-start ranges. Must be `0` or `1`. The default is `0`.
+ * @returns The array containing the parsed integers. Duplicates are not removed. The order of the
+ * integers is the same as in the range definition string.
+ * @throws {RangeError} If `max` is not an integer greater than `0` or if `start` is not `0` or `1`.
+ * @throws {SyntaxError} If the range definition is invalid, like in `1-3-5` or `3--5` or `1-3.6`.
+ */
+export function getIntegersFromRanges(value: string, max: number, start: 0 | 1 = 0): number[] {
+    if (!Number.isInteger(max) || max <= 0) {
+        throw new RangeError("Parameter 'max' must be an integer greater than 0.");
+    }
+    if (start !== 0 && start !== 1) {
+        throw new RangeError("Parameter 'start' must be 0 or 1.");
+    }
+    const appendRange = (result: number[], from: number, to: number): void => { // eslint-disable-line jsdoc/require-jsdoc
+        const step = from <= to ? 1 : -1;
+        for (let value = from; value !== to + step; value += step) {
+            result.push(value);
+        }
+    };
+    const result: number[] = [];
+    // Everything
+    if (value.trim() === "") {
+        appendRange(result, start, max);
+        return result;
+    }
+    // Everything in reverse order
+    if (value.trim() === "-") {
+        appendRange(result, max, start);
+        return result;
+    }
+    const parts = value.split(/\s*,\s*/).filter((part) => part.length > 0);
+    for (const part of parts) {
+        // "3-5" => 3,4,5
+        const rangeMatch = part.match(/^(\d+)\s*-\s*(\d+)$/);
+        if (rangeMatch !== null) {
+            const from = Number(rangeMatch[1]);
+            const to = Number(rangeMatch[2]);
+            if (from < to && from <= max) {
+                appendRange(result, from, Math.min(to, max));
+            } else if (from > to && to <= max) {
+                appendRange(result, Math.min(from, max), to);
+            } else if (from === to && from <= max) {
+                result.push(from);
+            }
+            continue;
+        }
+        // "3-" => 3,4,5,...,max
+        const openEndMatch = part.match(/^(\d+)\s*-\s*$/);
+        if (openEndMatch !== null) {
+            const from = Number(openEndMatch[1]);
+            if (from <= max) {
+                appendRange(result, from, max);
+            }
+            continue;
+        }
+        // "-3" => start,start+1,...,3
+        const openStartMatch = part.match(/^-\s*(\d+)$/);
+        if (openStartMatch !== null) {
+            const to = Math.min(Number(openStartMatch[1]), max);
+            appendRange(result, start, to);
+            continue;
+        }
+        // "3" => 3
+        const singleMatch = part.match(/^\d+$/);
+        if (singleMatch !== null) {
+            const page = Number(singleMatch[0]);
+            if (page <= max) {
+                result.push(page);
+            }
+            continue;
+        }
+        // If none of the above patterns matched, the range definition must be invalid.
+        throw new SyntaxError(`Invalid integer range definition: "${part}".`);
+    }
+    return result;
+}
+// #endregion
+//////////////////////////////
+
+//////////////////////////////
+// #region System
 /**
  * Return type of the function `getDebouncedFnc`.
  */
@@ -505,19 +615,11 @@ export const generateUUID: () => UUID =
                 (+c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> +c / 4).toString(16)
             );
         };
+// #endregion
+//////////////////////////////
 
-/**
- * A function that returns a string starting with `_` followed by six random alphanumeric
- * characters. The intended use case is to create unique IDs for HTML elements. The characters are
- * chosen out of the range `0` to `9` and `a` to `z` so a result could be `_j9e20f`. This function
- * is also used internally for generating IDs for components where an ID is needed/recommended but
- * not explicitly provided.
- * @returns A string starting with `_` followed by six random alphanumeric characters.
- */
-export const cid = (): string => {
-    return "_" + Math.floor(Math.random() * 2176782336 /* 36 ** 6 */).toString(36).padStart(6, "0");
-};
-
+//////////////////////////////
+// #region Objects
 /**
  * Checks if an object has a property with the value `undefined`.
  * @param obj The object to be checked.
