@@ -401,11 +401,12 @@ export function clamp(n: number, boundary1: number, boundary2: number): number {
  * Parses comma separated integer range definitions into a list of integers.
  * @param value The range definition string. Examples:
  * - "3-5" => 3,4,5
+ * - "5-2" => 5,4,3,2
  * - "3-" => 3,4,5,...,max
  * - "-3" => start,start+1,...,3 ('open-start range', where `start` is either `0` or `1`, see below)
  * - "3" => 3
  * - "3-5,7,9-11" => 3,4,5,7,9,10,11
- * - "3 - 5, 7 , 9 -11 " => 3,4,5,7,9,10,11 (whitespace in the definition string is ignored)
+ * - "3 - 5, 7 , 11 -9 " => 3,4,5,7,11,10,9 (whitespace in the definition string is ignored)
  * - "" => start,start+1,...,max (an empty string results in a range from `start` to `max`,
  *   whitespace is ignored)
  * - "-" => max,...,start+1,start (a single dash results in a range from `max` to `start`,

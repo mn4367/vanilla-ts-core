@@ -1,4 +1,10 @@
 import {
+    ALL_EVENTS,
+    DefaultEventMap,
+    EventMapVoid,
+    IEventListener
+} from "./Events.js";
+import {
     AnyType,
     AutoCapitalizeAttrValues,
     ContentEditableAttrValues,
@@ -18,53 +24,6 @@ import {
     ResizableValues
 } from "./Types.js";
 
-
-/**
- * An event map that initially has no members.
- */
-export interface EventMapVoid { } // eslint-disable-line @typescript-eslint/no-empty-object-type
-
-/**
- * An event listener entry. This is the type which is used to add/remove event listeners on a
- * component by calling `on(...)`/`off(...)`. This is the component which is referred to in the
- * documentation of the `target` member.
- */
-export interface IEventListener<EventMap extends EventMapVoid = HTMLElementEventMap> {
-    /** The event type e.g. "click", "pointerdown", "my-event" */
-    Type: keyof EventMap;
-    /** The event callback function. */
-    Listener(this: Node, ev: EventMap[keyof EventMap]): AnyType;
-    /**
-     * Event listener options.
-     * @see https://developer.mozilla.org/en-US/docs/Web/API/EventTarget/addEventListener
-     */
-    Options: boolean | AddEventListenerOptions | undefined;
-    /**
-     * `true`, if listener execution is temporarily suspended, otherwise `false`.
-     */
-    Suspended: boolean;
-}
-
-/**
- * Modes for `allEvents()`.
- */
-export enum ALL_EVENTS {
-    /**
-     * Removes all event listeners which have been registered with `on()` permanently from the
-     * component.
-     */
-    OFF = 0,
-    /**
-     * Suspends the execution of all event listeners which have been registered with `on()` on the
-     * component.
-     */
-    SUSPEND = 1,
-    /**
-     * Resumes the execution of all event listeners which have been registered with `on()` on the
-     * component.
-     */
-    RESUME = 2
-}
 
 /**
  * The type of a component.
@@ -633,7 +592,7 @@ export interface IComponent extends IDisposable {
 /**
  * Base interface for components based on a node or HTML element.
  */
-export interface INodeComponent<T extends Node, EventMap extends EventMapVoid = HTMLElementEventMap> extends IComponent {
+export interface INodeComponent<T extends Node, EventMap extends EventMapVoid = DefaultEventMap> extends IComponent {
     /**
      * The underlying DOM node or HTML element.\
      * __Note:__ Using this property to append/remove other DOM elements _to a component_, e.g.
@@ -792,7 +751,7 @@ export interface INodeComponent<T extends Node, EventMap extends EventMapVoid = 
      * Add an event listener to this component. This function must work identical to the
      * `addEventListener` function. The listener is added to the `DOM` property of `this`.
      * @see https://developer.mozilla.org/en-US/docs/Web/API/EventTarget/addEventListener
-     * @param type Event type (click, blur etc.).
+     * @param type Event type (`click`, `blur` etc.).
      * @param listener Listener function.
      * @param options Event listener options.
      * @returns This instance.
@@ -802,15 +761,13 @@ export interface INodeComponent<T extends Node, EventMap extends EventMapVoid = 
     /**
      * Add an event listener to this component that is invoked at most once after being added. This
      * function must work identical to the regular `addEventListener` function. The listener is
-     * added to the `DOM` property of `this` and automatically removed when invoked.
+     * added to the `DOM` property of `this` and automatically removed after the first invocation.
      * @see https://developer.mozilla.org/en-US/docs/Web/API/EventTarget/addEventListener
-     * @param type Event type (click, blur etc.).
+     * @param type Event type (`click`, `blur` etc.).
      * @param listener Listener function.
      * @param options Event listener options. In implementations, if `options` is a boolean value it
      * must be replaced with `{capture: options, once: true}`, if `options` is an object or
-     * `undefined` or `null`, it must be replaced with `{...options, once: true}`.\
-     * __Note:__ Listeners added with `once` are ignored by `allEvents()`, it is also impossible to
-     * turn off, suspend or resume such listeners.
+     * `undefined` or `null`, it must be replaced with `{...options, once: true}`.
      * @returns This instance.
      */
     once<K extends keyof EventMap>(type: K, listener: (this: T, ev: EventMap[K]) => AnyType, options?: boolean | AddEventListenerOptions): this;
@@ -820,7 +777,7 @@ export interface INodeComponent<T extends Node, EventMap extends EventMapVoid = 
      * regular `removeEventListener` function. The listener is removed from the `DOM` property of
      * `this`.
      * @see https://developer.mozilla.org/en-US/docs/Web/API/EventTarget/removeEventListener
-     * @param type Event type (click, blur etc.).
+     * @param type Event type (`click`, `blur` etc.).
      * @param listener Listener function.
      * @param options Event listener options.
      * @returns This instance.
@@ -832,7 +789,7 @@ export interface INodeComponent<T extends Node, EventMap extends EventMapVoid = 
      * isn't already suspended. This is different from simply using `off()` and then `on()` again
      * with the listener because the execution order of installed listeners is retained with using
      * `suspend()`/`resume()`.
-     * @param type Event type (click, blur etc.).
+     * @param type Event type (`click`, `blur` etc.).
      * @param listener Listener function.
      * @param options Event listener options.
      * @returns This instance.
@@ -844,7 +801,7 @@ export interface INodeComponent<T extends Node, EventMap extends EventMapVoid = 
      * suspended. This is different from simply using `off()` and then `on()` again with the
      * listener because the execution order of installed listeners is retained with using
      * `suspend()`/`resume()`.
-     * @param type Event type (click, blur etc.).
+     * @param type Event type (`click`, `blur` etc.).
      * @param listener Listener function.
      * @param options Event listener options.
      * @returns This instance.
@@ -853,8 +810,8 @@ export interface INodeComponent<T extends Node, EventMap extends EventMapVoid = 
 
     /**
      * Suspends or resumes the execution of _all currently_ registered regular event listeners on
-     * this component or removes all listeners permanently from this component. `allEvents()` must
-     * ignore listeners added with `once()`. If all listeners are suspended and then an additional
+     * this component or removes all listeners permanently from this component. If all listeners are
+     * suspended and then an additional
      * listener is added this listener will be active.
      * @param mode Can be one of `OFF`, `SUSPEND` or `RESUME`. `SUSPEND` and `RESUME` are used to
      * suspend or resume the listeners execution. All listeners will be kept on the component.
@@ -868,7 +825,7 @@ export interface INodeComponent<T extends Node, EventMap extends EventMapVoid = 
 /**
  * Base interface for HTML element based components.
  */
-export interface IElementComponent<T extends HTMLElement, EventMap extends EventMapVoid = HTMLElementEventMap> extends INodeComponent<T, EventMap>, IGlobalDOMAttributes {
+export interface IElementComponent<T extends HTMLElement, EventMap extends EventMapVoid = DefaultEventMap> extends INodeComponent<T, EventMap>, IGlobalDOMAttributes {
     /**
      * The default CSS class name of the underlying HTML element. A common convention for CSS class
      * names is Kepab case, e.g. for the class `PersonInfoCard` the default CSS class name could be
@@ -1178,12 +1135,12 @@ export interface IElementComponent<T extends HTMLElement, EventMap extends Event
 /**
  * Base interface for HTML element based components, that *do not allow* adding children.
  */
-export interface IElementVoidComponent<T extends HTMLElementVoid, EventMap extends EventMapVoid = HTMLElementEventMap> extends IElementComponent<T, EventMap> { } // eslint-disable-line @typescript-eslint/no-empty-object-type
+export interface IElementVoidComponent<T extends HTMLElementVoid, EventMap extends EventMapVoid = DefaultEventMap> extends IElementComponent<T, EventMap> { } // eslint-disable-line @typescript-eslint/no-empty-object-type
 
 /**
  * Base interface for HTML element based components, that *do allow* adding children.
  */
-export interface IElementWithChildrenComponent<T extends HTMLElementWithChildren, Child extends INodeComponent<Node> = INodeComponent<Node>, EventMap extends EventMapVoid = HTMLElementEventMap> extends IElementComponent<T, EventMap>, IChildren<Child> {
+export interface IElementWithChildrenComponent<T extends HTMLElementWithChildren, Child extends INodeComponent<Node> = INodeComponent<Node>, EventMap extends EventMapVoid = DefaultEventMap> extends IElementComponent<T, EventMap>, IChildren<Child> {
     /**
      * Set phrasing content of the component. This is a pure convenience setter which allows to
      * add/replace phrasing content in an easy way without having to resort to `clear()` +
@@ -1544,9 +1501,7 @@ export interface IEventBus<EventMap extends Record<keyof EventMap, AnyType>> {
 
     /**
      * Add an event listener to this event bus that is invoked at most once after being added. The
-     * listener is automatically inactive after its invocation.\
-     * __Note:__ Listeners added with `once` are ignored by `allEvents()`, it is also impossible
-     * to turn off, suspend or resume such listeners.
+     * listener is automatically removed after its first invocation.
      * @param type Event type.
      * @param listener Listener function.
      * @returns This instance.

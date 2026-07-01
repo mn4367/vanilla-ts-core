@@ -1,8 +1,10 @@
-import { INodeComponent } from "./Interfaces.js";
+import {
+    INodeComponent
+} from "./Interfaces.js";
 
 
 //////////////////////////////
-// #region Global types
+// #region Global common types
 /**
  * ESLint complains about `any` so it's declared here as an alias.
  */
@@ -440,17 +442,8 @@ export type ResizableValues = false | "none" | "both" | "horizontal" | "vertical
 // #endregion
 //////////////////////////////
 
-/**
- * Default values for constructing events (`{ bubbles: true, cancelable: false, composed: true }`).
- */
-export const DEFAULT_EVENT_INIT_DICT = { bubbles: true, cancelable: false, composed: true }; // eslint-disable-line jsdoc/require-jsdoc
-
-/**
- * Default values for constructing cancelable events
- * (`{ bubbles: true, cancelable: true, composed: true }`).
- */
-export const DEFAULT_CANCELABLE_EVENT_INIT_DICT = { bubbles: true, cancelable: true, composed: true }; // eslint-disable-line jsdoc/require-jsdoc
-
+//////////////////////////////
+// #region Misc
 /**
  * Names of CSS style properties.
  */
@@ -469,3 +462,5 @@ export type CSSPropertyNames = keyof Omit<
  * An object representing multiple CSS style declarations.
  */
 export type CSSStyleDeclarations = { [key in CSSPropertyNames]?: NullableString };
+// #endregion
+//////////////////////////////

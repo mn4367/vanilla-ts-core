@@ -7,8 +7,11 @@ import {
     IChildrenMixin
 } from "./Classes.js";
 import {
+    DefaultEventMap,
+    EventMapVoid
+} from "./Events.js";
+import {
     ComponentType,
-    EventMapVoid,
     IComponent,
     IElementWithChildrenComponent,
     IIsElementComponent,
@@ -21,14 +24,17 @@ import {
     HTMLElementWithChildren,
     HTMLElementWithChildrenTagName
 } from "./Types.js";
-import { mixin, toKebabCase } from "./Utils.js";
+import {
+    mixin,
+    toKebabCase
+} from "./Utils.js";
 
 
 /**
  * Base implementation for all components, *that do not allow* to add child components.
  * @see {@link AElementComponentVoid}
  */
-export class ElementComponentVoid<T extends HTMLElementVoid, EventMap extends EventMapVoid = HTMLElementEventMap> extends AElementComponentVoid<T, EventMap> {
+export class ElementComponentVoid<T extends HTMLElementVoid, EventMap extends EventMapVoid = DefaultEventMap> extends AElementComponentVoid<T, EventMap> {
     /**
      * Create instance based on an HTML element type without children.
      * @param _tagName Tag name of the HTML element.
@@ -51,7 +57,7 @@ export class ElementComponentVoid<T extends HTMLElementVoid, EventMap extends Ev
  * Base implementation for all components, *that do allow* to add child components.
  * @see {@link AElementComponentWithChildren}
  */
-export class ElementComponentWithChildren<T extends HTMLElementWithChildren, Child extends INodeComponent<Node> = INodeComponent<Node>, EventMap extends EventMapVoid = HTMLElementEventMap> extends AElementComponentWithChildren<T, Child, EventMap> {
+export class ElementComponentWithChildren<T extends HTMLElementWithChildren, Child extends INodeComponent<Node> = INodeComponent<Node>, EventMap extends EventMapVoid = DefaultEventMap> extends AElementComponentWithChildren<T, Child, EventMap> {
     /**
      * Create instance based on an HTML element type with children.
      * @param _tagName Tag name of the HTML element.
@@ -76,7 +82,7 @@ export class ElementComponentWithChildren<T extends HTMLElementWithChildren, Chi
  * Simple wrapper helper component for a void DOM element. The component is fully functional but no
  * event handlers of the target element are adopted.
  */
-export class WrappedDOMElementComponentVoid<EventMap extends EventMapVoid = HTMLElementEventMap> extends AElementComponentVoid<HTMLElementVoid, EventMap> {
+export class WrappedDOMElementComponentVoid<EventMap extends EventMapVoid = DefaultEventMap> extends AElementComponentVoid<HTMLElementVoid, EventMap> {
     /**
      * Create instance that wraps a target DOM element with a component instance.
      * @param target The DOM element to be wrapped.
@@ -95,7 +101,7 @@ export class WrappedDOMElementComponentVoid<EventMap extends EventMapVoid = HTML
  * to an already existing DOM element, for example for building an application inside an arbitrary
  * (empty) div element somewhere in the page.
  */
-export class WrappedDOMElementComponentWithChildren<Child extends INodeComponent<Node> = INodeComponent<Node>, EventMap extends EventMapVoid = HTMLElementEventMap> extends AElementComponentWithChildren<HTMLElementWithChildren, Child, EventMap> {
+export class WrappedDOMElementComponentWithChildren<Child extends INodeComponent<Node> = INodeComponent<Node>, EventMap extends EventMapVoid = DefaultEventMap> extends AElementComponentWithChildren<HTMLElementWithChildren, Child, EventMap> {
     /**
      * Create an instance that wraps a target DOM element with a component instance.
      * @param target The DOM element to be wrapped.
@@ -294,7 +300,7 @@ export class CSSClassNameFactory extends ComponentFactory<IComponent> {
  * This class also implements `IChildren` so that components can be added/removed/inserted directly
  * to the application instance which will forward them to the root element/component.
  */
-export abstract class VTSApplication<EventMap extends EventMapVoid = HTMLElementEventMap> extends ComponentFactory<IComponent> { // eslint-disable-line @typescript-eslint/no-unsafe-declaration-merging
+export abstract class VTSApplication<EventMap extends EventMapVoid = DefaultEventMap> extends ComponentFactory<IComponent> { // eslint-disable-line @typescript-eslint/no-unsafe-declaration-merging
     /**
      * The root DOM container element for all components to be added.
      */
@@ -381,7 +387,7 @@ export interface VTSApplication extends IChildrenMixin { } // eslint-disable-lin
  * );
  * ```
  */
-export class VTS_App<EventMap extends EventMapVoid = HTMLElementEventMap> extends VTSApplication<EventMap> {
+export class VTS_App<EventMap extends EventMapVoid = DefaultEventMap> extends VTSApplication<EventMap> {
     #cf: CSSClassNameFactory;
 
     /**

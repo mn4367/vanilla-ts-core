@@ -1,12 +1,16 @@
 
 import {
-    ACustomComponentEvent,
     AElementComponent
 } from "./Classes.js";
 import {
     ComponentFactory,
     ElementComponentWithChildren
 } from "./Components.js";
+import {
+    ACustomComponentEvent,
+    DefaultEventMap,
+    EventMapVoid
+} from "./Events.js";
 import {
     INodeComponent
 } from "./Interfaces.js";
@@ -65,7 +69,7 @@ import {
 /**
  * 'Alt' getter/setter and set method returning this instance.
  */
-export abstract class AltAttr<T extends HTMLElementWithAlt, EventMap extends HTMLElementEventMap = HTMLElementEventMap> extends AElementComponent<T, EventMap> {
+export abstract class AltAttr<T extends HTMLElementWithAlt, EventMap extends EventMapVoid = DefaultEventMap> extends AElementComponent<T, EventMap> {
     /**
      * Get/set the `alt` attribute value of the component. `null` or an empty string removes the
      * attribute.
@@ -99,7 +103,7 @@ export type AutocompleteAttributeValues = "on" | "off" | string | null; // eslin
 /**
  * 'Autocomplete' getter/setter and set method returning this instance.
  */
-export abstract class AutocompleteAttr<T extends HTMLElementWithAutocomplete, EventMap extends HTMLElementEventMap = HTMLElementEventMap> extends AElementComponent<T, EventMap> {
+export abstract class AutocompleteAttr<T extends HTMLElementWithAutocomplete, EventMap extends EventMapVoid = DefaultEventMap> extends AElementComponent<T, EventMap> {
     /**
      * Get/set the `autocomplete` attribute value of the component. Allowed values are `on`, `off`,
      * strings and `null`. `null` or an empty string removes the attribute.
@@ -136,7 +140,7 @@ export class CheckedEvent<S extends INodeComponent<Node>, D extends object = {
 /**
  * 'Checked' getter/setter and set method returning this instance.
  */
-export abstract class CheckedAttr<T extends HTMLInputElement, EventMap extends HTMLElementEventMap = HTMLElementEventMap> extends AElementComponent<T, EventMap> {
+export abstract class CheckedAttr<T extends HTMLInputElement, EventMap extends EventMapVoid = DefaultEventMap> extends AElementComponent<T, EventMap> {
     /**
      * Get/set the `checked` attribute value of the component (`checkbox` or `radio`).\
      * __Note:__ Only supported for the input elements of the types `checkbox` and `radio`.
@@ -181,7 +185,7 @@ export type CrossOriginAttributeValues = "anonymous" | "use-credentials" | "" | 
 /**
  * 'CrossOrigin' getter/setter and set method returning this instance.
  */
-export abstract class CrossOriginAttr<T extends HTMLElementWithCrossorigin, EventMap extends HTMLElementEventMap = HTMLElementEventMap> extends AElementComponent<T, EventMap> {
+export abstract class CrossOriginAttr<T extends HTMLElementWithCrossorigin, EventMap extends EventMapVoid = DefaultEventMap> extends AElementComponent<T, EventMap> {
     /**
      * Get/set the `crossorigin` attribute value of the component. Allowed values are `anonymous`,
      * `use-credentials` an empty string and `null` (both of the latter remove the attribute).
@@ -211,7 +215,7 @@ export abstract class CrossOriginAttr<T extends HTMLElementWithCrossorigin, Even
  * __Note:__ Only some inputs can have a 'DataList' attribute (`list` attribute).
  * @see `@vanilla-ts/core HTMLInputsWithDataList`
  */
-export abstract class DataListAttr<T extends HTMLInputElement, EventMap extends HTMLElementEventMap = HTMLElementEventMap> extends AElementComponent<T, EventMap> {
+export abstract class DataListAttr<T extends HTMLInputElement, EventMap extends EventMapVoid = DefaultEventMap> extends AElementComponent<T, EventMap> {
     /**
      * Get/set the datalist (suggestion values) of the component. If the length of `values` is `0`,
      * the attribute is removed.
@@ -275,7 +279,7 @@ export abstract class DataListAttr<T extends HTMLInputElement, EventMap extends 
 /**
  * 'Dirname' getter/setter and set method returning this instance.
  */
-export abstract class DirnameAttr<T extends HTMLTextAreaElement | HTMLInputElement, EventMap extends HTMLElementEventMap = HTMLElementEventMap> extends AElementComponent<T, EventMap> {
+export abstract class DirnameAttr<T extends HTMLTextAreaElement | HTMLInputElement, EventMap extends EventMapVoid = DefaultEventMap> extends AElementComponent<T, EventMap> {
     /**
      * Get/set the `dirName` attribute value of the component.  `null` or an empty string removes
      * the attribute. The type of an input element must be `hidden`, `text`, `search`, `tel`, `url`,
@@ -305,7 +309,7 @@ export abstract class DirnameAttr<T extends HTMLTextAreaElement | HTMLInputEleme
 /**
  * 'Download' getter/setter and set method returning this instance.
  */
-export abstract class DownloadAttr<T extends HTMLElementWithDownload, EventMap extends HTMLElementEventMap = HTMLElementEventMap> extends AElementComponent<T, EventMap> {
+export abstract class DownloadAttr<T extends HTMLElementWithDownload, EventMap extends EventMapVoid = DefaultEventMap> extends AElementComponent<T, EventMap> {
     /**
      * Get/set the `download` attribute of the component. `null` or an empty string removes the
      * attribute.
@@ -332,7 +336,7 @@ export abstract class DownloadAttr<T extends HTMLElementWithDownload, EventMap e
 /**
  * 'For' getter/setter and set method returning this instance.
  */
-export abstract class ForAttr<T extends HTMLLabelElement | HTMLOutputElement, EventMap extends HTMLElementEventMap = HTMLElementEventMap> extends AElementComponent<T, EventMap> {
+export abstract class ForAttr<T extends HTMLLabelElement | HTMLOutputElement, EventMap extends EventMapVoid = DefaultEventMap> extends AElementComponent<T, EventMap> {
     /**
      * Get/set `for` attribute value of underlying HTML element. When used with `<label>`, the `for`
      * attribute has a value which is the id of the form element it relates to. When used with an
@@ -364,7 +368,7 @@ export abstract class ForAttr<T extends HTMLLabelElement | HTMLOutputElement, Ev
 /**
  * 'Href' getter/setter and set method returning this instance.
  */
-export abstract class HrefAttr<T extends HTMLElementWithHref, EventMap extends HTMLElementEventMap = HTMLElementEventMap> extends AElementComponent<T, EventMap> {
+export abstract class HrefAttr<T extends HTMLElementWithHref, EventMap extends EventMapVoid = DefaultEventMap> extends AElementComponent<T, EventMap> {
     /**
      * Get/set the `href` attribute of the component. `null` or an empty string removes the
      * attribute.
@@ -391,7 +395,7 @@ export abstract class HrefAttr<T extends HTMLElementWithHref, EventMap extends H
 /**
  * 'Hreflang' getter/setter and set method returning this instance.
  */
-export abstract class HreflangAttr<T extends HTMLElementWithHreflang, EventMap extends HTMLElementEventMap = HTMLElementEventMap> extends AElementComponent<T, EventMap> {
+export abstract class HreflangAttr<T extends HTMLElementWithHreflang, EventMap extends EventMapVoid = DefaultEventMap> extends AElementComponent<T, EventMap> {
     /**
      * Get/set the `hreflang` attribute of the component. `null` or an empty string removes the
      * attribute.
@@ -418,7 +422,7 @@ export abstract class HreflangAttr<T extends HTMLElementWithHreflang, EventMap e
 /**
  * 'Label' getter/setter and set method returning this instance.
  */
-export abstract class LabelAttr<T extends HTMLElementWithLabel, EventMap extends HTMLElementEventMap = HTMLElementEventMap> extends AElementComponent<T, EventMap> {
+export abstract class LabelAttr<T extends HTMLElementWithLabel, EventMap extends EventMapVoid = DefaultEventMap> extends AElementComponent<T, EventMap> {
     /**
      * Get/set the `label` attribute value of the component. `null` or an empty string removes the
      * attribute.
@@ -456,7 +460,7 @@ export type LoadingAttributeValues = "lazy" | "eager" | null;
 /**
  * 'Loading' getter/setter and set method returning this instance.
  */
-export abstract class LoadingAttr<T extends HTMLElementWithLoading, EventMap extends HTMLElementEventMap = HTMLElementEventMap> extends AElementComponent<T, EventMap> {
+export abstract class LoadingAttr<T extends HTMLElementWithLoading, EventMap extends EventMapVoid = DefaultEventMap> extends AElementComponent<T, EventMap> {
     /**
      * Get/set the `loading` attribute value of the component. Allowed values are `lazy`, `eager`
      * and `null`. `null` or an empty string removes the attribute.
@@ -484,7 +488,7 @@ export abstract class LoadingAttr<T extends HTMLElementWithLoading, EventMap ext
 /**
  * 'Min/Max' getter/setter and set method returning this instance.
  */
-export abstract class MinMaxAttr<T extends HTMLInputElement, EventMap extends HTMLElementEventMap = HTMLElementEventMap> extends AElementComponent<T, EventMap> {
+export abstract class MinMaxAttr<T extends HTMLInputElement, EventMap extends EventMapVoid = DefaultEventMap> extends AElementComponent<T, EventMap> {
     /**
      * Get/set the `min` attribute value of the component. `null` or an empty string removes the
      * attribute.
@@ -532,7 +536,7 @@ export abstract class MinMaxAttr<T extends HTMLInputElement, EventMap extends HT
 /**
  * 'MinLength/MaxLength' getters/setters and set methods returning this instance.
  */
-export abstract class MinMaxLengthAttr<T extends HTMLInputElement | HTMLTextAreaElement, EventMap extends HTMLElementEventMap = HTMLElementEventMap> extends AElementComponent<T, EventMap> {
+export abstract class MinMaxLengthAttr<T extends HTMLInputElement | HTMLTextAreaElement, EventMap extends EventMapVoid = DefaultEventMap> extends AElementComponent<T, EventMap> {
     /**
      * Get/set the `minLength` attribute of this input. A value lower than or equal to `0` or `null`
      * removes the attribute.
@@ -611,7 +615,7 @@ export abstract class MinMaxLengthAttr<T extends HTMLInputElement | HTMLTextArea
 /**
  * 'Multiple' getter/setter and set method returning this instance.
  */
-export abstract class MultipleAttr<T extends HTMLElementWithMultiple, EventMap extends HTMLElementEventMap = HTMLElementEventMap> extends AElementComponent<T, EventMap> {
+export abstract class MultipleAttr<T extends HTMLElementWithMultiple, EventMap extends EventMapVoid = DefaultEventMap> extends AElementComponent<T, EventMap> {
     /**
      * Get/set the `multiple` attribute of the component.
      */
@@ -637,7 +641,7 @@ export abstract class MultipleAttr<T extends HTMLElementWithMultiple, EventMap e
 /**
  * 'Name' getter/setter and set method returning this instance.
  */
-export abstract class NameAttr<T extends HTMLElementWithName, EventMap extends HTMLElementEventMap = HTMLElementEventMap> extends AElementComponent<T, EventMap> {
+export abstract class NameAttr<T extends HTMLElementWithName, EventMap extends EventMapVoid = DefaultEventMap> extends AElementComponent<T, EventMap> {
     /**
      * Get/set `name` attribute value of the component. `null` or an empty string removes the
      * attribute.
@@ -665,7 +669,7 @@ export abstract class NameAttr<T extends HTMLElementWithName, EventMap extends H
  * 'Disabled' getter/setter and set method returning this instance. In addition to the regular
  * `Disabled` getter/setter/method this also handles the 'native' DOM attribute `disabled`.
  */
-export abstract class NativeDisabledAttr<T extends HTMLElementWithDisabled, EventMap extends HTMLElementEventMap = HTMLElementEventMap> extends AElementComponent<T, EventMap> {
+export abstract class NativeDisabledAttr<T extends HTMLElementWithDisabled, EventMap extends EventMapVoid = DefaultEventMap> extends AElementComponent<T, EventMap> {
     /**
      * Set 'native' `disabled` attribute value of the component.
      * @param v The value to be set.
@@ -716,7 +720,7 @@ export abstract class NativeDisabledAttr<T extends HTMLElementWithDisabled, Even
 /**
  * 'Open' getter/setter and set method returning this instance.
  */
-export abstract class OpenAttr<T extends HTMLElementWithOpen, EventMap extends HTMLElementEventMap = HTMLElementEventMap> extends AElementComponent<T, EventMap> {
+export abstract class OpenAttr<T extends HTMLElementWithOpen, EventMap extends EventMapVoid = DefaultEventMap> extends AElementComponent<T, EventMap> {
     /**
      * Get/set the `open` attribute of the component.
      */
@@ -742,7 +746,7 @@ export abstract class OpenAttr<T extends HTMLElementWithOpen, EventMap extends H
 /**
  * 'Pattern' getter/setter and set method returning this instance.
  */
-export abstract class PatternAttr<T extends HTMLInputElement, EventMap extends HTMLElementEventMap = HTMLElementEventMap> extends AElementComponent<T, EventMap> {
+export abstract class PatternAttr<T extends HTMLInputElement, EventMap extends EventMapVoid = DefaultEventMap> extends AElementComponent<T, EventMap> {
     /**
      * Get/set the `pattern` attribute value of the component. `null` or an empty string removes the
      * attribute.
@@ -769,7 +773,7 @@ export abstract class PatternAttr<T extends HTMLInputElement, EventMap extends H
 /**
  * 'Ping' getter/setter and set method returning this instance.
  */
-export abstract class PingAttr<T extends HTMLElementWithPing, EventMap extends HTMLElementEventMap = HTMLElementEventMap> extends AElementComponent<T, EventMap> {
+export abstract class PingAttr<T extends HTMLElementWithPing, EventMap extends EventMapVoid = DefaultEventMap> extends AElementComponent<T, EventMap> {
     /**
      * Get/set the `ping` attribute of the component. If the length of `v` is `0`, the attribute is
      * removed.
@@ -796,7 +800,7 @@ export abstract class PingAttr<T extends HTMLElementWithPing, EventMap extends H
 /**
  * 'Placeholder' getter/setter and set method returning this instance.
  */
-export abstract class PlaceholderAttr<T extends HTMLInputElement | HTMLTextAreaElement, EventMap extends HTMLElementEventMap = HTMLElementEventMap> extends AElementComponent<T, EventMap> {
+export abstract class PlaceholderAttr<T extends HTMLInputElement | HTMLTextAreaElement, EventMap extends EventMapVoid = DefaultEventMap> extends AElementComponent<T, EventMap> {
     /**
      * Get/set the `placeholder` attribute value of the component. `null` or an empty string removes
      * the attribute.
@@ -823,7 +827,7 @@ export abstract class PlaceholderAttr<T extends HTMLInputElement | HTMLTextAreaE
 /**
  * 'Readonly' getter/setter and set method returning this instance.
  */
-export abstract class ReadonlyAttr<T extends HTMLElementWithReadonly, EventMap extends HTMLElementEventMap = HTMLElementEventMap> extends AElementComponent<T, EventMap> {
+export abstract class ReadonlyAttr<T extends HTMLElementWithReadonly, EventMap extends EventMapVoid = DefaultEventMap> extends AElementComponent<T, EventMap> {
     /**
      * Get/set the `readOnly` attribute value of the component.\
      * __Note:__ Not supported for the input elements of the types `hidden`, `range`, `color`,
@@ -860,7 +864,7 @@ export type ReferrerPolicyAttributeValues = "no-referrer" | "no-referrer-when-do
 /**
  * 'ReferrerPolicy' getter/setter and set method returning this instance.
  */
-export abstract class ReferrerPolicyAttr<T extends HTMLElementWithReferrerPolicy, EventMap extends HTMLElementEventMap = HTMLElementEventMap> extends AElementComponent<T, EventMap> {
+export abstract class ReferrerPolicyAttr<T extends HTMLElementWithReferrerPolicy, EventMap extends EventMapVoid = DefaultEventMap> extends AElementComponent<T, EventMap> {
     /**
      * Get/set the `referrerpolicy` attribute of the component. `null` or an empty string removes
      * the attribute.
@@ -887,7 +891,7 @@ export abstract class ReferrerPolicyAttr<T extends HTMLElementWithReferrerPolicy
 /**
  * 'Rel' getter/setter and set method returning this instance.
  */
-export abstract class RelAttr<T extends HTMLElementWithRel, EventMap extends HTMLElementEventMap = HTMLElementEventMap> extends AElementComponent<T, EventMap> {
+export abstract class RelAttr<T extends HTMLElementWithRel, EventMap extends EventMapVoid = DefaultEventMap> extends AElementComponent<T, EventMap> {
     /**
      * Get/set the `rel` attribute of the component. `null` or an empty string removes the
      * attribute.
@@ -914,7 +918,7 @@ export abstract class RelAttr<T extends HTMLElementWithRel, EventMap extends HTM
 /**
  * 'Required' getter/setter and set method returning this instance.
  */
-export abstract class RequiredAttr<T extends HTMLElementWithRequired, EventMap extends HTMLElementEventMap = HTMLElementEventMap> extends AElementComponent<T, EventMap> {
+export abstract class RequiredAttr<T extends HTMLElementWithRequired, EventMap extends EventMapVoid = DefaultEventMap> extends AElementComponent<T, EventMap> {
     /**
      * Get/set the `required` attribute value of the component.
      */
@@ -940,7 +944,7 @@ export abstract class RequiredAttr<T extends HTMLElementWithRequired, EventMap e
 /**
  * 'Size' getter/setter and set method returning this instance.
  */
-export abstract class SizeAttr<T extends HTMLInputElement | HTMLSelectElement, EventMap extends HTMLElementEventMap = HTMLElementEventMap> extends AElementComponent<T, EventMap> {
+export abstract class SizeAttr<T extends HTMLInputElement | HTMLSelectElement, EventMap extends EventMapVoid = DefaultEventMap> extends AElementComponent<T, EventMap> {
     /**
      * Get/set the `size` attribute value of the component. A value lower than or equal to `0` or
      * `null` or an empty string removes the attribute.
@@ -968,7 +972,7 @@ export abstract class SizeAttr<T extends HTMLInputElement | HTMLSelectElement, E
 /**
  * 'Src' getter/setter and set method returning this instance.
  */
-export abstract class SrcAttr<T extends HTMLElementWithSrc, EventMap extends HTMLElementEventMap = HTMLElementEventMap> extends AElementComponent<T, EventMap> {
+export abstract class SrcAttr<T extends HTMLElementWithSrc, EventMap extends EventMapVoid = DefaultEventMap> extends AElementComponent<T, EventMap> {
     /**
      * Get/set the `src` attribute value of the component. `null` or an empty string removes the
      * attribute.
@@ -995,7 +999,7 @@ export abstract class SrcAttr<T extends HTMLElementWithSrc, EventMap extends HTM
 /**
  * 'Step' getter/setter and set method returning this instance.
  */
-export abstract class StepAttr<T extends HTMLInputElement, EventMap extends HTMLElementEventMap = HTMLElementEventMap> extends AElementComponent<T, EventMap> {
+export abstract class StepAttr<T extends HTMLInputElement, EventMap extends EventMapVoid = DefaultEventMap> extends AElementComponent<T, EventMap> {
     /**
      * Get/set the `step` attribute value of the component. `null` or an empty string removes the
      * attribute.
@@ -1053,7 +1057,7 @@ export type TargetAttributeValues = "_self" | "_blank" | "_parent" | "_top" | "_
 /**
  * 'Target' getter/setter and set method returning this instance.
  */
-export abstract class TargetAttr<T extends HTMLElementWithTarget, EventMap extends HTMLElementEventMap = HTMLElementEventMap> extends AElementComponent<T, EventMap> {
+export abstract class TargetAttr<T extends HTMLElementWithTarget, EventMap extends EventMapVoid = DefaultEventMap> extends AElementComponent<T, EventMap> {
     /**
      * Get/set the `target` attribute of the component. Apart from a string `target` can also have
      * the special values `_self`, `_blank`, `_parent`, `_top` and `_unfencedTop`. `null` or an
@@ -1083,7 +1087,7 @@ export abstract class TargetAttr<T extends HTMLElementWithTarget, EventMap exten
 /**
  * 'Type' getter/setter and set method returning this instance.
  */
-export abstract class TypeAttr<T extends HTMLElementWithType, EventMap extends HTMLElementEventMap = HTMLElementEventMap> extends AElementComponent<T, EventMap> {
+export abstract class TypeAttr<T extends HTMLElementWithType, EventMap extends EventMapVoid = DefaultEventMap> extends AElementComponent<T, EventMap> {
     /**
      * Get/set the `type` attribute of the component. `null` or an empty string removes the
      * attribute.
@@ -1115,7 +1119,7 @@ export abstract class TypeAttr<T extends HTMLElementWithType, EventMap extends H
  * - The attribute `Value` must be overridden by `input` elements of type `image` since `value`
  *   isn't avaliable for this type, so using `Value`/`value()` should do nothing.
  */
-export abstract class ValueAttr<T extends HTMLElementWithSValue | HTMLElementWithNValue, EventMap extends HTMLElementEventMap = HTMLElementEventMap, V = T extends HTMLElementWithSValue ? string : T extends HTMLElementWithNValue ? number : never> extends AElementComponent<T, EventMap> {
+export abstract class ValueAttr<T extends HTMLElementWithSValue | HTMLElementWithNValue, EventMap extends EventMapVoid = DefaultEventMap, V = T extends HTMLElementWithSValue ? string : T extends HTMLElementWithNValue ? number : never> extends AElementComponent<T, EventMap> {
     /**
      * Get/set the `value` attribute value of the component.
      */
@@ -1143,7 +1147,7 @@ export abstract class ValueAttr<T extends HTMLElementWithSValue | HTMLElementWit
  * __Note:__ This is a hybrid attribute: for some elements the type of `width`/`height` is `string`
  * while for others the type is `number`.
  */
-export abstract class WidthHeightAttr<T extends HTMLElementWithSWidthHeight | HTMLElementWithNWidthHeight, EventMap extends HTMLElementEventMap = HTMLElementEventMap, V = T extends HTMLElementWithSWidthHeight ? string : T extends HTMLElementWithNWidthHeight ? number : never> extends AElementComponent<T, EventMap> {
+export abstract class WidthHeightAttr<T extends HTMLElementWithSWidthHeight | HTMLElementWithNWidthHeight, EventMap extends EventMapVoid = DefaultEventMap, V = T extends HTMLElementWithSWidthHeight ? string : T extends HTMLElementWithNWidthHeight ? number : never> extends AElementComponent<T, EventMap> {
     /**
      * Get/set the `width` attribute value of the component.
      */
@@ -1195,7 +1199,7 @@ export abstract class WidthHeightAttr<T extends HTMLElementWithSWidthHeight | HT
 /**
  * 'SelectionStart' getter/setter and set method returning this instance.
  */
-export abstract class SelectionStartProp<T extends HTMLInputElement | HTMLTextAreaElement, EventMap extends HTMLElementEventMap = HTMLElementEventMap> extends AElementComponent<T, EventMap> {
+export abstract class SelectionStartProp<T extends HTMLInputElement | HTMLTextAreaElement, EventMap extends EventMapVoid = DefaultEventMap> extends AElementComponent<T, EventMap> {
     /**
      * Get/set the `selectionStart` property value of the component.
      */
@@ -1221,7 +1225,7 @@ export abstract class SelectionStartProp<T extends HTMLInputElement | HTMLTextAr
 /**
  * 'SelectionEnd' getter/setter and set method returning this instance.
  */
-export abstract class SelectionEndProp<T extends HTMLInputElement | HTMLTextAreaElement, EventMap extends HTMLElementEventMap = HTMLElementEventMap> extends AElementComponent<T, EventMap> {
+export abstract class SelectionEndProp<T extends HTMLInputElement | HTMLTextAreaElement, EventMap extends EventMapVoid = DefaultEventMap> extends AElementComponent<T, EventMap> {
     /**
      * Get/set the `selectionEnd` property value of the component.
      */
@@ -1254,7 +1258,7 @@ export abstract class SelectionEndProp<T extends HTMLInputElement | HTMLTextArea
  * __Note:__ This class is part of `@vanilla-ts/core` and not of `@vanilla-ts/dom` because it is
  * used in the {@link DataListAttr} DOM property (to avoid cyclic package dependencies).
  */
-export class Option<Child extends INodeComponent<Node> = INodeComponent<Node>, EventMap extends HTMLElementEventMap = HTMLElementEventMap> extends ElementComponentWithChildren<HTMLOptionElement, Child, EventMap> { // eslint-disable-line @typescript-eslint/no-unsafe-declaration-merging
+export class Option<Child extends INodeComponent<Node> = INodeComponent<Node>, EventMap extends EventMapVoid = DefaultEventMap> extends ElementComponentWithChildren<HTMLOptionElement, Child, EventMap> { // eslint-disable-line @typescript-eslint/no-unsafe-declaration-merging
     /**
      * Create Option component.
      * @param phrase The phrasing content for the `<option>` element. Due to the limited styling
@@ -1301,7 +1305,7 @@ export class Option<Child extends INodeComponent<Node> = INodeComponent<Node>, E
 
 // Augment class definition with the DOM attributes/properties introduced by `mixinDOMProperties()`
 // above.
-export interface Option<Child extends INodeComponent<Node> = INodeComponent<Node>, EventMap extends HTMLElementEventMap = HTMLElementEventMap> extends // eslint-disable-line jsdoc/require-jsdoc,@typescript-eslint/no-unused-vars
+export interface Option<Child extends INodeComponent<Node> = INodeComponent<Node>, EventMap extends EventMapVoid = DefaultEventMap> extends // eslint-disable-line jsdoc/require-jsdoc,@typescript-eslint/no-unused-vars
     LabelAttr<HTMLOptionElement, EventMap>,
     ValueAttr<HTMLOptionElement, EventMap>,
     NativeDisabledAttr<HTMLOptionElement, EventMap> { }

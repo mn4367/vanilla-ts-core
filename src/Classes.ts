@@ -1,8 +1,14 @@
 import {
     ALL_EVENTS,
+    DefaultEventMap,
+    EventMapVoid,
+    IEventListener,
+    PointerHoldEvent,
+    PointerHoldOptions,
+} from "./Events.js";
+import {
     ComponentType,
     EventBusEvent,
-    EventMapVoid,
     IChildren,
     IComponent,
     IComponentFactory,
@@ -11,7 +17,6 @@ import {
     IElementVoidComponent,
     IElementWithChildrenComponent,
     IEventBus,
-    IEventListener,
     IFragment,
     IGlobalDOMAttributes,
     IIsElementComponent,
@@ -25,7 +30,6 @@ import {
     ContentEditableAttrValues,
     CSSPropertyNames,
     CSSStyleDeclarations,
-    DEFAULT_EVENT_INIT_DICT,
     DirAttrValues,
     EnterKeyHintAttrValues,
     HTMLElementVoid,
@@ -139,7 +143,7 @@ export abstract class AComponent implements IComponent {
  * Abstract base implementation of all node or element based components.
  * @see {@link INodeComponent}
  */
-export abstract class ANodeComponent<T extends Node, EventMap extends EventMapVoid = HTMLElementEventMap> extends AComponent implements INodeComponent<T, EventMap> {
+export abstract class ANodeComponent<T extends Node, EventMap extends EventMapVoid = DefaultEventMap> extends AComponent implements INodeComponent<T, EventMap> {
     /** The underlying node or element. */
     protected _dom!: T;
     /** The parent component. */
@@ -238,10 +242,10 @@ export abstract class ANodeComponent<T extends Node, EventMap extends EventMapVo
     /** @inheritdoc */
     public get Listeners(): IEventListener[] {
         return this.eventListeners.map(listener => {
-            return {
+            const result: IEventListener = {
                 /* eslint-disable jsdoc/require-jsdoc */
                 Type: listener.Type,
-                Listener: listener.Listener, // eslint-disable-line @typescript-eslint/unbound-method
+                Listener: listener.Listener,
                 Options: typeof listener.Options === "boolean"
                     ? listener.Options
                     : listener.Options
@@ -250,6 +254,26 @@ export abstract class ANodeComponent<T extends Node, EventMap extends EventMapVo
                 Suspended: listener.Suspended
                 /* eslint-enable */
             };
+            listener.WrappedListener && (result.WrappedListener = listener.WrappedListener);
+            if (listener.AuxiliaryListeners) {
+                result.AuxiliaryListeners = listener.AuxiliaryListeners.map(auxListener => {
+                    const elem: IEventListener = {
+                        /* eslint-disable jsdoc/require-jsdoc */
+                        Type: auxListener.Type,
+                        Listener: auxListener.Listener,
+                        Options: typeof auxListener.Options === "boolean"
+                            ? auxListener.Options
+                            : auxListener.Options
+                                ? { ...auxListener.Options }
+                                : undefined,
+                        Suspended: auxListener.Suspended,
+                        /* eslint-enable */
+                    };
+                    auxListener.WrappedListener && (elem.WrappedListener = auxListener.WrappedListener);
+                    return elem;
+                });
+            }
+            return result;
         });
     }
 
@@ -265,26 +289,29 @@ export abstract class ANodeComponent<T extends Node, EventMap extends EventMapVo
     }
 
     /** @inheritdoc */
-    public on<K extends keyof EventMap>(type: K, listener: (this: T, ev: EventMap[K]) => AnyType, options?: boolean | AddEventListenerOptions): this {
+    public on<K extends keyof EventMap>(type: K, listener: (this: T, ev: EventMap[K]) => AnyType, options?: boolean | (K extends "pointerhold" ? AddEventListenerOptions & PointerHoldOptions : AddEventListenerOptions)): this {
         const listenerOptions = options === undefined
             ? undefined
             : typeof options === "boolean"
                 ? options
                 : this.sortEventListenerOptions(options);
-        (<Node>this._dom).addEventListener(<keyof HTMLElementEventMap>type, <EventListener>listener, listenerOptions);
+        this._dom.addEventListener(<string>type, <EventListener>listener, listenerOptions);
         /* eslint-disable jsdoc/require-jsdoc */
         this.eventListeners.push({
-            Type: <keyof HTMLElementEventMap>type,
+            Type: <string>type,
             Listener: <EventListener>listener,
             Options: listenerOptions,
-            Suspended: false
+            Suspended: false,
+            AuxiliaryListeners: type === "pointerhold"
+                ? PointerHoldEvent.setupAuxiliaryListeners(this, listenerOptions)
+                : undefined
         });
         /* eslint-enable */
         return this;
     }
 
     /** @inheritdoc */
-    public once<K extends keyof EventMap>(type: K, listener: (this: T, ev: EventMap[K]) => AnyType, options?: boolean | AddEventListenerOptions): this {
+    public once<K extends keyof EventMap>(type: K, listener: (this: T, ev: EventMap[K]) => AnyType, options?: boolean | (K extends "pointerhold" ? AddEventListenerOptions & PointerHoldOptions : AddEventListenerOptions)): this {
         /* eslint-disable jsdoc/require-jsdoc */
         const listenerOptions = options === undefined
             ? { once: true }
@@ -292,44 +319,66 @@ export abstract class ANodeComponent<T extends Node, EventMap extends EventMapVo
                 ? { capture: options, once: true }
                 : this.sortEventListenerOptions({ ...options, once: true });
         /* eslint-enable */
-        (<Node>this._dom).addEventListener(<keyof HTMLElementEventMap>type, <EventListener>listener, listenerOptions);
+        /**
+         * For `once()`, wrap the listener in another function to be able to remove the listener
+         * after the first execution.
+         * @param ev The original event.
+         */
+        const wrappedListener = (ev: EventMap[K]) => {
+            listener.call(this._dom, ev);
+            this.off(type, listener, listenerOptions);
+        };
+        this._dom.addEventListener(<string>type, <EventListener>wrappedListener, listenerOptions);
         /* eslint-disable jsdoc/require-jsdoc */
         this.eventListeners.push({
-            Type: <keyof HTMLElementEventMap>type,
+            Type: <string>type,
             Listener: <EventListener>listener,
+            WrappedListener: <EventListener>wrappedListener,
             Options: listenerOptions,
-            Suspended: false
+            Suspended: false,
+            AuxiliaryListeners: type === "pointerhold"
+                ? PointerHoldEvent.setupAuxiliaryListeners(this, listenerOptions)
+                : undefined
         });
         /* eslint-enable */
         return this;
     }
 
     /** @inheritdoc */
-    public off<K extends keyof EventMap>(type: K, listener: (this: T, ev: EventMap[K]) => AnyType, options?: boolean | AddEventListenerOptions): this {
+    public off<K extends keyof EventMap>(type: K, listener: (this: T, ev: EventMap[K]) => AnyType, options?: boolean | (K extends "pointerhold" ? AddEventListenerOptions & PointerHoldOptions : AddEventListenerOptions)): this {
         const { Index } = this.indexOfEventListener(type, listener, options); // eslint-disable-line jsdoc/require-jsdoc
         if (Index !== -1) {
             const listener = this.eventListeners[Index];
-            this._dom.removeEventListener(listener.Type, listener.Listener, listener.Options); // eslint-disable-line @typescript-eslint/unbound-method
+            this._dom.removeEventListener(listener.Type, listener.WrappedListener ?? listener.Listener, listener.Options);
+            for (const auxListener of listener.AuxiliaryListeners ?? []) {
+                this._dom.removeEventListener(auxListener.Type, auxListener.WrappedListener ?? auxListener.Listener, auxListener.Options);
+            }
             this.eventListeners.splice(Index, 1);
         }
         return this;
     }
 
     /** @inheritdoc */
-    public suspend<K extends keyof EventMap>(type: K, listener: (this: T, ev: EventMap[K]) => AnyType, options?: boolean | AddEventListenerOptions): this {
+    public suspend<K extends keyof EventMap>(type: K, listener: (this: T, ev: EventMap[K]) => AnyType, options?: boolean | (K extends "pointerhold" ? AddEventListenerOptions & PointerHoldOptions : AddEventListenerOptions)): this {
         const { Index } = this.indexOfEventListener(type, listener, options, false); // eslint-disable-line jsdoc/require-jsdoc
         if (Index !== -1 && this.eventListeners[Index].Suspended === false) {
             this.eventListeners[Index].Suspended = true;
+            for (const auxListener of this.eventListeners[Index].AuxiliaryListeners ?? []) {
+                auxListener.Suspended = true;
+            }
             this.reinstallEventListeners();
         }
         return this;
     }
 
     /** @inheritdoc */
-    public resume<K extends keyof EventMap>(type: K, listener: (this: T, ev: EventMap[K]) => AnyType, options?: boolean | AddEventListenerOptions): this {
+    public resume<K extends keyof EventMap>(type: K, listener: (this: T, ev: EventMap[K]) => AnyType, options?: boolean | (K extends "pointerhold" ? AddEventListenerOptions & PointerHoldOptions : AddEventListenerOptions)): this {
         const { Index } = this.indexOfEventListener(type, listener, options, true); // eslint-disable-line jsdoc/require-jsdoc
         if (Index !== -1 && this.eventListeners[Index].Suspended === true) {
             this.eventListeners[Index].Suspended = false;
+            for (const auxListener of this.eventListeners[Index].AuxiliaryListeners ?? []) {
+                auxListener.Suspended = false;
+            }
             this.reinstallEventListeners();
         }
         return this;
@@ -340,19 +389,28 @@ export abstract class ANodeComponent<T extends Node, EventMap extends EventMapVo
         switch (mode) {
             case ALL_EVENTS.OFF:
                 for (const listener of this.eventListeners) {
-                    this._dom.removeEventListener(listener.Type, <EventListener>listener.Listener, listener.Options); // eslint-disable-line @typescript-eslint/unbound-method
+                    this._dom.removeEventListener(listener.Type, listener.WrappedListener ?? listener.Listener, listener.Options);
+                    for (const auxListener of listener.AuxiliaryListeners ?? []) {
+                        this._dom.removeEventListener(auxListener.Type, auxListener.WrappedListener ?? auxListener.Listener, auxListener.Options);
+                    }
                 }
                 this.eventListeners.length = 0;
                 break;
             case ALL_EVENTS.SUSPEND:
                 for (const listener of this.eventListeners) {
                     listener.Suspended = true;
-                    this._dom.removeEventListener(listener.Type, <EventListener>listener.Listener, listener.Options); // eslint-disable-line @typescript-eslint/unbound-method
+                    for (const auxListener of listener.AuxiliaryListeners ?? []) {
+                        auxListener.Suspended = true;
+                    }
                 }
+                this.reinstallEventListeners();
                 break;
             case ALL_EVENTS.RESUME:
                 for (const listener of this.eventListeners) {
                     listener.Suspended = false;
+                    for (const auxListener of listener.AuxiliaryListeners ?? []) {
+                        auxListener.Suspended = false;
+                    }
                 }
                 this.reinstallEventListeners();
                 break;
@@ -415,7 +473,7 @@ export abstract class ANodeComponent<T extends Node, EventMap extends EventMapVo
      * to this parameter.
      * @returns The index of the listener found or `-1` if the listener couldn't be found.
      */
-    protected indexOfEventListener<K extends keyof EventMap>(type: K, listener: (this: T, ev: EventMap[K]) => AnyType, options?: boolean | AddEventListenerOptions, suspended?: boolean): { Index: number; ListenerOptions?: boolean | AddEventListenerOptions; } { // eslint-disable-line jsdoc/require-jsdoc
+    protected indexOfEventListener<K extends keyof EventMap>(type: K, listener: (this: T, ev: EventMap[K]) => AnyType, options?: boolean | (K extends "pointerhold" ? AddEventListenerOptions & PointerHoldOptions : AddEventListenerOptions), suspended?: boolean): { Index: number; ListenerOptions?: boolean | (K extends "pointerhold" ? AddEventListenerOptions & PointerHoldOptions : AddEventListenerOptions); } { // eslint-disable-line jsdoc/require-jsdoc
         const listenerOptions = options === undefined
             ? undefined
             : typeof options === "boolean"
@@ -440,10 +498,16 @@ export abstract class ANodeComponent<T extends Node, EventMap extends EventMapVo
      */
     protected reinstallEventListeners(): void {
         for (const listener of this.eventListeners) {
-            this._dom.removeEventListener(listener.Type, <EventListener>listener.Listener, listener.Options); // eslint-disable-line @typescript-eslint/unbound-method
+            this._dom.removeEventListener(listener.Type, listener.WrappedListener ?? listener.Listener, listener.Options);
+            for (const auxListener of listener.AuxiliaryListeners ?? []) {
+                this._dom.removeEventListener(auxListener.Type, auxListener.WrappedListener ?? auxListener.Listener, auxListener.Options);
+            }
         }
         for (const listener of this.eventListeners) {
-            listener.Suspended || this._dom.addEventListener(listener.Type, <EventListener>listener.Listener, listener.Options); // eslint-disable-line @typescript-eslint/unbound-method
+            listener.Suspended || this._dom.addEventListener(listener.Type, listener.WrappedListener ?? listener.Listener, listener.Options);
+            for (const auxListener of listener.AuxiliaryListeners ?? []) {
+                auxListener.Suspended || this._dom.addEventListener(auxListener.Type, auxListener.WrappedListener ?? auxListener.Listener, auxListener.Options);
+            }
         }
     }
 }
@@ -454,7 +518,7 @@ export abstract class ANodeComponent<T extends Node, EventMap extends EventMapVo
  * @see https://developer.mozilla.org/en-US/docs/Web/HTML/Global_attributes
  * @see {@link IGlobalDOMAttributes}
  */
-export abstract class AGlobalDOMAttributes<T extends HTMLElement, EventMap extends EventMapVoid = HTMLElementEventMap> extends ANodeComponent<T, EventMap> implements IGlobalDOMAttributes {
+export abstract class AGlobalDOMAttributes<T extends HTMLElement, EventMap extends EventMapVoid = DefaultEventMap> extends ANodeComponent<T, EventMap> implements IGlobalDOMAttributes {
     /** @inheritdoc */
     public get AutoCapitalize(): AutoCapitalizeAttrValues {
         return <AutoCapitalizeAttrValues>this._dom.autocapitalize;
@@ -747,7 +811,7 @@ export abstract class AGlobalDOMAttributes<T extends HTMLElement, EventMap exten
  * Abstract base implementation of all HTML element based components.
  * @see {@link IElementComponent}
  */
-export abstract class AElementComponent<T extends (HTMLElementWithChildren | HTMLElementVoid), EventMap extends EventMapVoid = HTMLElementEventMap> extends ANodeComponent<T, EventMap> implements IElementComponent<T, EventMap> { // eslint-disable-line @typescript-eslint/no-unsafe-declaration-merging
+export abstract class AElementComponent<T extends (HTMLElementWithChildren | HTMLElementVoid), EventMap extends EventMapVoid = DefaultEventMap> extends ANodeComponent<T, EventMap> implements IElementComponent<T, EventMap> { // eslint-disable-line @typescript-eslint/no-unsafe-declaration-merging
     static {
         /** Mixin additional global DOM attributes */
         mixinDOMProperties(this, AGlobalDOMAttributes);
@@ -1079,13 +1143,13 @@ export abstract class AElementComponent<T extends (HTMLElementWithChildren | HTM
 }
 
 // Augment class definition with the DOM attributes introduced by `mixinDOMAttributes()`.
-export interface AElementComponent<T extends (HTMLElementWithChildren | HTMLElementVoid), EventMap extends EventMapVoid = HTMLElementEventMap> extends AGlobalDOMAttributes<T, EventMap> { } // eslint-disable-line jsdoc/require-jsdoc,@typescript-eslint/no-empty-object-type
+export interface AElementComponent<T extends (HTMLElementWithChildren | HTMLElementVoid), EventMap extends EventMapVoid = DefaultEventMap> extends AGlobalDOMAttributes<T, EventMap> { } // eslint-disable-line jsdoc/require-jsdoc,@typescript-eslint/no-empty-object-type
 
 /**
  * Abstract base implementation of a component, *that does not allow* adding child components.
  * @see {@link IElementVoidComponent}
  */
-export abstract class AElementComponentVoid<T extends HTMLElementVoid, EventMap extends EventMapVoid = HTMLElementEventMap> extends AElementComponent<T, EventMap> implements IElementVoidComponent<T, EventMap> { }
+export abstract class AElementComponentVoid<T extends HTMLElementVoid, EventMap extends EventMapVoid = DefaultEventMap> extends AElementComponent<T, EventMap> implements IElementVoidComponent<T, EventMap> { }
 
 /////////////////////////////
 // #region AChildren
@@ -1588,7 +1652,7 @@ export interface IChildrenMixin<Child extends INodeComponent<Node> = INodeCompon
 /**
  * Abstract base implementation of a component, *that does allow* adding child components.
  */
-export abstract class AElementComponentWithChildren<T extends HTMLElementWithChildren, Child extends INodeComponent<Node> = INodeComponent<Node>, EventMap extends EventMapVoid = HTMLElementEventMap> extends AElementComponent<T, EventMap> implements IElementWithChildrenComponent<T, Child, EventMap> { // eslint-disable-line @typescript-eslint/no-unsafe-declaration-merging
+export abstract class AElementComponentWithChildren<T extends HTMLElementWithChildren, Child extends INodeComponent<Node> = INodeComponent<Node>, EventMap extends EventMapVoid = DefaultEventMap> extends AElementComponent<T, EventMap> implements IElementWithChildrenComponent<T, Child, EventMap> { // eslint-disable-line @typescript-eslint/no-unsafe-declaration-merging
     /**
      * Inner helper class for creating DOM text node components without relying on a similar
      * component available elsewhere (e.g. `Text` class exported from `@vanilla-ts/dom/Text.ts`).
@@ -1795,7 +1859,7 @@ export interface AElementComponentWithChildren<T extends HTMLElementWithChildren
  * }
  * ```
  */
-export abstract class AElementComponentWithInternalUI<UI extends (IElementComponent<HTMLElement> & IChildren), EventMap extends EventMapVoid = HTMLElementEventMap> extends AElementComponent<HTMLElement, EventMap> {
+export abstract class AElementComponentWithInternalUI<UI extends (IElementComponent<HTMLElement> & IChildren), EventMap extends EventMapVoid = DefaultEventMap> extends AElementComponent<HTMLElement, EventMap> {
     /** The container which constitutes the component tree/user interface of the component. */
     protected ui: UI;
     #mountUI: boolean;
@@ -2148,42 +2212,6 @@ export abstract class AComponentFactory<T extends IComponent> implements ICompon
 }
 
 /**
- * Utility class that creates a custom event. `T` is the type/name of the custom event, the `detail`
- * property of the event will have a `Sender` property `S` that is the component instance that emits
- * the event and optional typed payload data `D`.
- */
-export abstract class ACustomComponentEvent<T extends string, S extends INodeComponent<Node>, D extends Record<string, AnyType> = object> extends CustomEvent<({ Sender: S; } & D)> { // eslint-disable-line jsdoc/require-jsdoc
-    /**
-     * Create a custom event with a `Sender` property and optional payload data.
-     * @param type The type/name of the event.
-     * @param sender The component instance that emits the event.
-     * @param eventData Optional custom event payload data.
-     * @param customEventInitDict Optional event properties. This is an object with the properties
-     * `bubbles`, `cancelable` and `composed`. If `customEventInitDict` is `undefined`, `bubbles`
-     * and `composed` are set to `true` and `cancelable` is set to `false`.
-     */
-    constructor(type: T, sender: S, eventData?: D, customEventInitDict?: EventInit) {
-        super(type, {
-            /* eslint-disable jsdoc/require-jsdoc */
-            ...(customEventInitDict || DEFAULT_EVENT_INIT_DICT),
-            detail: {
-                Sender: sender,
-                ...(eventData ? eventData : <D>{})
-            }
-            /* eslint-enable */
-        });
-    }
-
-    /**
-     * Shorthand for the getting the `detail` property of the event.
-     * @returns The detail property of the event.
-     */
-    public get $(): { Sender: S; } & D { // eslint-disable-line jsdoc/require-jsdoc
-        return this.detail;
-    }
-}
-
-/**
  * Abstract base implementation of an event bus.
  *
  * __Note:__ Avoid passing anonymous or unbound functions to `on()` or `once()` as this makes it
@@ -2303,13 +2331,14 @@ export class AEventBus<EventMap extends Record<keyof EventMap, AnyType>> impleme
          */
         const wrappedListener = (ev: CustomEvent<EventMap[K]>): AnyType => {
             listener(
-                ev.detail, {
-                /* eslint-disable jsdoc/require-jsdoc */
-                Canceled: ev.defaultPrevented,
-                cancel: () => ev.preventDefault(),
-                stopPropagation: () => ev.stopImmediatePropagation()
-                /* eslint-enable */
-            }
+                ev.detail,
+                {
+                    /* eslint-disable jsdoc/require-jsdoc */
+                    Canceled: ev.defaultPrevented,
+                    cancel: () => ev.preventDefault(),
+                    stopPropagation: () => ev.stopImmediatePropagation()
+                    /* eslint-enable */
+                }
             );
         };
         this.wrappedListeners.push([listener, wrappedListener]);
@@ -2322,13 +2351,17 @@ export class AEventBus<EventMap extends Record<keyof EventMap, AnyType>> impleme
         // eslint-disable-next-line jsdoc/require-param
         /** @see `wrappedListener` in {@link AEventBus.on()} */
         const wrappedListener = (ev: CustomEvent<EventMap[K]>): AnyType => {
-            listener(ev.detail, {
-                /* eslint-disable jsdoc/require-jsdoc */
-                Canceled: ev.defaultPrevented,
-                cancel: () => ev.preventDefault(),
-                stopPropagation: () => ev.stopImmediatePropagation()
-                /* eslint-enable */
-            });
+            listener(
+                ev.detail,
+                {
+                    /* eslint-disable jsdoc/require-jsdoc */
+                    Canceled: ev.defaultPrevented,
+                    cancel: () => ev.preventDefault(),
+                    stopPropagation: () => ev.stopImmediatePropagation()
+                    /* eslint-enable */
+                }
+            );
+            this.off(type, listener);
         };
         this.wrappedListeners.push([listener, wrappedListener]);
         this.bus.once(type, wrappedListener);
