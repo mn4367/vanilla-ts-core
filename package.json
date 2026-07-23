@@ -2,8 +2,8 @@
   "name": "@vanilla-ts/core",
   "description": "TypeScript Web UI Library -- Core",
   "companyname": "mn4367",
-  "version": "0.0.1",
   "copyright": "©2026 mn4367",
+  "version": "0.3.0",
   "type": "module",
   "identifier": "mn4367.vanilla-ts.core",
   "keywords": [
@@ -27,7 +27,6 @@
   "bugs": {
     "url": "https://github.com/mn4367/vanilla-ts-core/issues"
   },
-  "private": "false",
   "license": "MIT",
   "exports": {
     ".": {
@@ -41,26 +40,28 @@
   },
   "sideEffects": false,
   "devDependencies": {
-    "@rollup/plugin-commonjs": "29.0.2",
+    "@rollup/plugin-commonjs": "29.0.3",
     "@rollup/plugin-json": "6.1.0",
     "@rollup/plugin-node-resolve": "16.0.3",
     "@rollup/plugin-terser": "1.0.0",
     "@types/node": "22.14.1",
-    "eslint-plugin-jsdoc": "62.9.0",
-    "eslint": "10.2.1",
+    "eslint-plugin-jsdoc": "63.2.0",
+    "eslint": "10.7.0",
     "fast-glob": "3.3.3",
-    "globals": "17.5.0",
-    "npm-run-all2": "8.0.4",
-    "rollup": "4.60.2",
+    "globals": "17.7.0",
+    "npm-run-all2": "9.0.2",
+    "rollup-plugin-css-only": "4.5.5",
+    "rollup": "4.62.2",
     "shx": "0.4.0",
-    "terser": "5.46.1",
-    "tsc-watch": "7.2.0",
-    "typescript-eslint": "8.59.0",
+    "terser": "5.49.0",
+    "tsc-watch": "7.2.1",
+    "typescript-eslint": "8.65.0",
     "typescript": "6.0.3"
   },
   "scripts": {
     "Watch": "npm-run-all -p watch:**",
     "Clean": "shx rm -rf ./types ./lib ./example/out ./example/index.js* ./playground/out ./playground/index.js*",
+    "Publish": "npm-run-all -s Clean compile:src && npm publish",
     "watch:src": "tsc -w -p ./src/tsconfig.src.json",
     "watch:example": "tsc-watch -p ./example/src/tsconfig.example.json --onSuccess \"npm run pack:example\"",
     "watch:playground": "tsc-watch -p ./playground/src/tsconfig.playground.json --onSuccess \"npm run pack:playground\"",
@@ -72,5 +73,10 @@
     "pack:playground": "rollup --silent -c ./playground/build/rollup.config.playground.mjs",
     "pack:playground:compress": "rollup --silent -c ./playground/build/rollup.config.playground.mjs --environment COMPRESS",
     "lint": "eslint -c ./eslint.config.mjs"
-  }
+  },
+  "files": [
+    "lib",
+    "src",
+    "types"
+  ]
 }
