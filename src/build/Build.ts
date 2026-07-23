@@ -1,10 +1,19 @@
-import commonjs from "@rollup/plugin-commonjs";
-import json from "@rollup/plugin-json";
+import _commonjs from "@rollup/plugin-commonjs";
+import _json from "@rollup/plugin-json";
 import { nodeResolve } from "@rollup/plugin-node-resolve";
 import fg, { Options } from "fast-glob";
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import path from "node:path";
 import { rollup as _rollup, RollupLog, RollupOptions } from "rollup";
+// @ts-expect-error ---
+import _css from "rollup-plugin-css-only";
+
+// CJS/ESM interop: NodeNext resolves these packages as CJS (no "type":"module"),
+// so the default import is typed as the module namespace instead of the callable
+// function. Cast to the correct function type via `typeof .default`.
+const commonjs = _commonjs as unknown as typeof _commonjs.default;
+const json = _json as unknown as typeof _json.default;
+const css = _css as unknown as typeof _css.default;
 
 /**
  * Collection of utilities for building/bundling `Vanilla.ts` based code.
@@ -48,13 +57,12 @@ export async function getImportedModuleFileNames(
                 ? nodeResolve()
                 : undefined,
             useCommonJS
-                // @ts-expect-error ---
                 ? commonjs()
                 : undefined,
             useJSON
-                // @ts-expect-error ---
                 ? json()
                 : undefined,
+            css({ output: false })
         ],
         /* eslint-enable */
     });
