@@ -61,7 +61,10 @@
   "scripts": {
     "Watch": "npm-run-all -p watch:**",
     "Clean": "shx rm -rf ./types ./lib ./example/out ./example/index.js* ./playground/out ./playground/index.js*",
+    "Build": "npm-run-all -p compile:src build:example build:playground",
     "Publish": "npm-run-all -s Clean compile:src && npm publish",
+    "build:example": "npm-run-all -s compile:example pack:example",
+    "build:playground": "npm-run-all -s compile:playground pack:playground",
     "watch:src": "tsc -w -p ./src/tsconfig.src.json",
     "watch:example": "tsc-watch -p ./example/src/tsconfig.example.json --onSuccess \"npm run pack:example\"",
     "watch:playground": "tsc-watch -p ./playground/src/tsconfig.playground.json --onSuccess \"npm run pack:playground\"",
