@@ -444,6 +444,12 @@ export type ResizableValues = false | "none" | "both" | "horizontal" | "vertical
 
 //////////////////////////////
 // #region Misc
+/** Orientation (of a component). */
+export enum Orientation {
+    HORIZONTAL = 0,
+    VERTICAL = 1
+}
+
 /**
  * Names of CSS style properties.
  */
