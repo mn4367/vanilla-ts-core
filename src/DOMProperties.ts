@@ -3,10 +3,6 @@ import {
     AElementComponent
 } from "./Classes.js";
 import {
-    ComponentFactory,
-    ElementComponentWithChildren
-} from "./Components.js";
-import {
     ACustomComponentEvent,
     DefaultEventMap,
     EventMapVoid
@@ -40,14 +36,8 @@ import {
     HTMLElementWithTarget,
     HTMLElementWithType,
     NullableNumber,
-    NullableString,
-    Phrase,
-    Phrases
+    NullableString
 } from "./Types.js";
-import {
-    cid,
-    mixinDOMProperties
-} from "./Utils.js";
 
 
 /**
@@ -56,9 +46,7 @@ import {
  * mixins to some DOM components to avoid repeating the code in the components themselves.
  *
  * To prevent circular dependencies and reference/initialization errors due to module
- * loading/execution these classes must not be used from classes in this project! The only exception
- * to this rule is currently the {@link Option} component (in this module) which is used by the
- * {@link DataListAttr} DOM property class.
+ * loading/execution these classes must not be used from classes in this project!
  * ---
  * @todo Extend with more DOM attributes/properties/utility DOM components.
  */
@@ -206,72 +194,6 @@ export abstract class CrossOriginAttr<T extends HTMLElementWithCrossorigin, Even
      */
     public crossOrigin(v: CrossOriginAttributeValues): this {
         this.attrib("crossorigin", v);
-        return this;
-    }
-}
-
-/**
- * 'DataList' (suggestion values) getter/setter and set method returning this instance.\
- * __Note:__ Only some inputs can have a 'DataList' attribute (`list` attribute).
- * @see `@vanilla-ts/core HTMLInputsWithDataList`
- */
-export abstract class DataListAttr<T extends HTMLInputElement, EventMap extends EventMapVoid = DefaultEventMap> extends AElementComponent<T, EventMap> {
-    /**
-     * Get/set the datalist (suggestion values) of the component. If the length of `values` is `0`,
-     * the attribute is removed.
-     */
-    public get DataList(): string[] {
-        const result: string[] = [];
-        const dataListID = this.attr("list");
-        if (dataListID) {
-            const dataList = this._dom.querySelector("#" + dataListID);
-            if (dataList) {
-                for (const option of dataList.querySelectorAll("option")) {
-                    result.push(option.value);
-                }
-            }
-        }
-        return result;
-    }
-    /** @inheritdoc */
-    public set DataList(values: string[]) {
-        this.dataList(values);
-    }
-
-    /**
-     * Set new suggestion values.
-     * @param values The new suggestion values. If the length of `values` is `0`, the attribute is
-     * removed.
-     * @returns This instance.
-     */
-    public dataList(values: string[]): this {
-        let dataListID = this.attr("list");
-        if (!dataListID) {
-            if (values.length === 0) {
-                return this;
-            }
-            dataListID = `dl${cid().slice(1)}`;
-        }
-        let dataList = document.getElementById(dataListID);
-        if (dataList && values.length === 0) {
-            this.attrib("list", null);
-            dataList.remove();
-            return this;
-        }
-        if (!dataList) {
-            dataList = document.createElement("datalist");
-            dataList.id = dataListID;
-            this.attrib("list", dataListID);
-            this._dom.appendChild(dataList);
-        }
-        while (dataList.lastChild) {
-            dataList.lastChild.remove();
-        }
-        for (const value of values) {
-            const option = document.createElement("option");
-            option.value = value;
-            dataList.append(option);
-        }
         return this;
     }
 }
@@ -1248,89 +1170,4 @@ export abstract class SelectionEndProp<T extends HTMLInputElement | HTMLTextArea
     }
 }
 // #endregion Properties
-/////////////////////////////
-
-
-/////////////////////////////
-// #region Utility DOM components
-/**
- * Option component (`<option>`).\
- * __Note:__ This class is part of `@vanilla-ts/core` and not of `@vanilla-ts/dom` because it is
- * used in the {@link DataListAttr} DOM property (to avoid cyclic package dependencies).
- */
-export class Option<Child extends INodeComponent<Node> = INodeComponent<Node>, EventMap extends EventMapVoid = DefaultEventMap> extends ElementComponentWithChildren<HTMLOptionElement, Child, EventMap> { // eslint-disable-line @typescript-eslint/no-unsafe-declaration-merging
-    /**
-     * Create Option component.
-     * @param phrase The phrasing content for the `<option>` element. Due to the limited styling
-     * capabilities of <option> elements, it is strongly recommended to use a text string text only.
-     */
-    constructor(...phrase: Phrases) {
-        super("option");
-        phrase.length > 0 && this.phrase(...phrase);
-    }
-
-    /**
-     * Get/set the `selected` attribute value of the component.
-     * @see https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/option#selected
-     */
-    public get Selecetd(): boolean {
-        return this._dom.selected;
-    }
-    /** @inheritdoc */
-    public set Selecetd(v: boolean) {
-        this._dom.selected = v;
-    }
-
-    /**
-     * Set `selected` attribute value of the component.
-     * @param v The value to be set.
-     * @see https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/option#selected
-     * @returns This instance.
-     */
-    public selected(v: boolean): this {
-        this._dom.selected = v;
-        return this;
-    }
-
-    static {
-        /** Mixin additional DOM attributes/properties. */
-        mixinDOMProperties(
-            this,
-            LabelAttr<HTMLOptionElement>,
-            NativeDisabledAttr<HTMLOptionElement>,
-            ValueAttr<HTMLOptionElement>
-        );
-    }
-}
-
-// Augment class definition with the DOM attributes/properties introduced by `mixinDOMProperties()`
-// above.
-export interface Option<Child extends INodeComponent<Node> = INodeComponent<Node>, EventMap extends EventMapVoid = DefaultEventMap> extends // eslint-disable-line jsdoc/require-jsdoc,@typescript-eslint/no-unused-vars
-    LabelAttr<HTMLOptionElement, EventMap>,
-    ValueAttr<HTMLOptionElement, EventMap>,
-    NativeDisabledAttr<HTMLOptionElement, EventMap> { }
-
-/**
- * Factory for `Option` components.
- */
-export class OptionFactory<T> extends ComponentFactory<Option> {
-    /**
-     * Create Option component.
-     * @param phrase The phrasing content for the `<option>` element. Due to the limited styling
-     * capabilities of <option> elements, it is strongly recommended to use a text string text only.
-     * @param data Optional arbitrary data passed to the `setupComponent()` function of the factory.
-     * @returns Header component.
-     */
-    public option(phrase?: Phrase | Phrases, data?: T): Option {
-        return this.setupComponent(
-            !phrase
-                ? new Option()
-                : Array.isArray(phrase)
-                    ? new Option(...phrase)
-                    : new Option(phrase),
-            data
-        );
-    }
-}
-// #endregion Utility DOM components
 /////////////////////////////
