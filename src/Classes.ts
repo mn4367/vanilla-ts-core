@@ -535,6 +535,21 @@ export abstract class AGlobalDOMAttributes<T extends HTMLElement, EventMap exten
     }
 
     /** @inheritdoc */
+    public get AutoCorrect(): boolean {
+        return this._dom.autocorrect;
+    }
+    /** @inheritdoc */
+    public set AutoCorrect(v: boolean) {
+        this._dom.autocorrect = v;
+    }
+
+    /** @inheritdoc */
+    public autoCorrect(v: boolean): this {
+        this._dom.autocorrect = v;
+        return this;
+    }
+
+    /** @inheritdoc */
     public get Autofocus(): boolean {
         return this._dom.autofocus;
     }
@@ -550,21 +565,6 @@ export abstract class AGlobalDOMAttributes<T extends HTMLElement, EventMap exten
     }
 
     /** @inheritdoc */
-    public get ContentEditable(): ContentEditableAttrValues {
-        return <ContentEditableAttrValues>this._dom.contentEditable;
-    }
-    /** @inheritdoc */
-    public set ContentEditable(v: ContentEditableAttrValues) {
-        this.contentEditable(v);
-    }
-
-    /** @inheritdoc */
-    public contentEditable(v: ContentEditableAttrValues): this {
-        v === false || v === "" ? this._dom.removeAttribute("contenteditable") : (<ContentEditableAttrValues>this._dom.contentEditable) = v;
-        return this;
-    }
-
-    /** @inheritdoc */
     public get Clazz(): NullableString {
         return !this._dom.hasAttribute("class") ? null : this._dom.className;
     }
@@ -576,6 +576,21 @@ export abstract class AGlobalDOMAttributes<T extends HTMLElement, EventMap exten
     /** @inheritdoc */
     public clazz(v: NullableString): this {
         v === null || v === "" ? this._dom.removeAttribute("class") : this._dom.className = v;
+        return this;
+    }
+
+    /** @inheritdoc */
+    public get ContentEditable(): ContentEditableAttrValues {
+        return <ContentEditableAttrValues>this._dom.contentEditable;
+    }
+    /** @inheritdoc */
+    public set ContentEditable(v: ContentEditableAttrValues) {
+        this.contentEditable(v);
+    }
+
+    /** @inheritdoc */
+    public contentEditable(v: ContentEditableAttrValues): this {
+        v === false || v === "" ? this._dom.removeAttribute("contenteditable") : (<ContentEditableAttrValues>this._dom.contentEditable) = v;
         return this;
     }
 

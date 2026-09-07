@@ -77,6 +77,18 @@ export interface IGlobalDOMAttributes {
     autoCapitalize(v: AutoCapitalizeAttrValues): this;
 
     /**
+     * Get/set `autocorrect` attribute value of the component.
+     */
+    AutoCorrect: boolean;
+
+    /**
+     * Set 'autocorrect' attribute value of the component.
+     * @param v The value to be set.
+     * @returns This instance.
+     */
+    autoCorrect(v: boolean): this;
+
+    /**
      * Get/set `autofocus` attribute value of the component.
      */
     Autofocus: boolean;
@@ -87,19 +99,6 @@ export interface IGlobalDOMAttributes {
      * @returns This instance.
      */
     autofocus(v: boolean): this;
-
-    /**
-     * Get/set `contentEditable` attribute value of the component. Setting `false` or an empty
-     * string will remove the attribute.
-     */
-    ContentEditable: ContentEditableAttrValues;
-
-    /**
-     * Set `contentEditable` attribute value of the component.
-     * @param v The value to be set. `false` or an empty string will remove the attribute.
-     * @returns This instance.
-     */
-    contentEditable(v: ContentEditableAttrValues): this;
 
     /**
      * Get/set `class` attribute value of the component. Setting `null` or an empty string will
@@ -113,6 +112,19 @@ export interface IGlobalDOMAttributes {
      * @returns This instance.
      */
     clazz(v: NullableString): this;
+
+    /**
+     * Get/set `contentEditable` attribute value of the component. Setting `false` or an empty
+     * string will remove the attribute.
+     */
+    ContentEditable: ContentEditableAttrValues;
+
+    /**
+     * Set `contentEditable` attribute value of the component.
+     * @param v The value to be set. `false` or an empty string will remove the attribute.
+     * @returns This instance.
+     */
+    contentEditable(v: ContentEditableAttrValues): this;
 
     /**
      * Get/set `dir` attribute value of the component. Setting `null` or an empty string will remove

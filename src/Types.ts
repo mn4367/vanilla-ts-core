@@ -407,6 +407,11 @@ export type HTMLInputsWithDataList = "text" | "search" | "url" | "tel" | "email"
 export type AutoCapitalizeAttrValues = "none" | "off" | "sentences" | "on" | "words" | "characters";
 
 /**
+ * Valid values for the DOM attribute `autocorrect`.
+ */
+export type AutoCorrectAttrValues = "on" | "off";
+
+/**
  * Valid values for the DOM attribute `contentEditable`.
  */
 export type ContentEditableAttrValues = boolean | "" | "plaintext-only";
