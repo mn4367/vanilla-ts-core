@@ -698,8 +698,8 @@ export interface INodeComponent<T extends Node, EventMap extends EventMapVoid = 
      * Called before removing this component from the `Children` of another component.
      *
      * Notes:
-     * - If this function is overridden in subclasses, `super.onBeforeUnmount(parent)` must be
-     *   called first!
+     * - If this function is overridden in subclasses, `super.onBeforeUnmount()` __must__ be called
+     *   in the overridden function!
      * - Implementations can/should use the `Connected` property in `onBeforeUnmount()` to avoid
      *   doing things that are not feasible for non-connected nodes/trees/sub-trees.
      */
@@ -709,8 +709,8 @@ export interface INodeComponent<T extends Node, EventMap extends EventMapVoid = 
      * Called after this component has been removed from the `Children` of another component.
      *
      * Notes:
-     * - If this function is overridden in subclasses, `super.onDidUnmount(parent)` must be called
-     *   last!
+     * - If this function is overridden in subclasses, `super.onDidUnmount()` __must__ be called
+     *   in the overridden function!
      * - Implementations can/should use the `Connected` property in `onDidUnmount()` to avoid doing
      *   things that are not feasible for non-connected nodes/trees/sub-trees.
      */
