@@ -409,49 +409,57 @@ export abstract class LoadingAttr<T extends HTMLElementWithLoading, EventMap ext
 }
 
 /**
- * 'Min/Max' getter/setter and set method returning this instance.
+ * 'Min'/'Max' (string|number) getter/setter and set method returning this instance.
+ * __Note:__ this is a hybrid attribute: for `HTMLInputElement` the type of `min`/`max` is `string`
+ * while for `HTMLMeterElement` the type is `number`.
  */
-export abstract class MinMaxAttr<T extends HTMLInputElement, EventMap extends EventMapVoid = DefaultEventMap> extends AElementComponent<T, EventMap> {
+export abstract class MinMaxAttr<T extends (HTMLInputElement | HTMLMeterElement), EventMap extends EventMapVoid = DefaultEventMap> extends AElementComponent<T, EventMap> {
     /**
-     * Get/set the `min` attribute value of the component. `null` or an empty string removes the
-     * attribute.
+     * Get/set the `min` attribute value of the component. `undefined` removes the attribute.\
+     * For __`HTMLInputElement`__: The getter returns `0` if the attribute is missing or invalid.
+     * When setting a value, the native DOM property handles range limits when reading the value;
+     * the supplied attribute value is preserved.
      */
-    public get Min(): string {
+    public get Min(): T["min"] {
         return this._dom.min;
     }
     /** @inheritdoc */
-    public set Min(v: NullableString) {
+    public set Min(v: T["min"] | undefined) {
         this.min(v);
     }
 
     /**
-     * Set `min` attribute value of the component.
-     * @param v The value to be set. `null` or an empty string removes the attribute.
+     * Set the `min` attribute value of the component.
+     * @param v The value to be set. If omitted or `undefined`, the attribute is removed.
      * @returns This instance.
      */
-    public min(v: NullableString): this {
-        this.attrib("min", v);
+    public min(v: T["min"] | undefined): this {
+        v === undefined
+            ? this._dom.removeAttribute("min")
+            : this._dom.min = v;
         return this;
     }
 
     /**
-     * Get/set the `max` attribute value of the component. `null` removes the attribute.
+     * Get/set the `max` attribute value of the component. `undefined` removes the attribute.
      */
-    public get Max(): string {
+    public get Max(): T["max"] {
         return this._dom.max;
     }
     /** @inheritdoc */
-    public set Max(v: NullableString) {
+    public set Max(v: T["max"] | undefined) {
         this.max(v);
     }
 
     /**
-     * Set `max` attribute value of the component.
-     * @param v The value to be set. `null` removes the attribute.
+     * Set the `max` attribute value of the component.
+     * @param v The value to be set. If omitted or `undefined`, the attribute is removed.
      * @returns This instance.
      */
-    public max(v: NullableString): this {
-        this.attrib("max", v);
+    public max(v: T["max"] | undefined): this {
+        v === undefined
+            ? this._dom.removeAttribute("max")
+            : this._dom.max = v;
         return this;
     }
 }
@@ -1042,16 +1050,16 @@ export abstract class TypeAttr<T extends HTMLElementWithType, EventMap extends E
  * - The attribute `Value` must be overridden by `input` elements of type `image` since `value`
  *   isn't avaliable for this type, so using `Value`/`value()` should do nothing.
  */
-export abstract class ValueAttr<T extends HTMLElementWithSValue | HTMLElementWithNValue, EventMap extends EventMapVoid = DefaultEventMap, V = T extends HTMLElementWithSValue ? string : T extends HTMLElementWithNValue ? number : never> extends AElementComponent<T, EventMap> {
+export abstract class ValueAttr<T extends HTMLElementWithSValue | HTMLElementWithNValue, EventMap extends EventMapVoid = DefaultEventMap> extends AElementComponent<T, EventMap> {
     /**
      * Get/set the `value` attribute value of the component.
      */
-    public get Value(): V {
-        return <V>this._dom.value;
+    public get Value(): T["value"] {
+        return this._dom.value;
     }
     /** @inheritdoc */
-    public set Value(v: V) {
-        (<V>this._dom.value) = v;
+    public set Value(v: T["value"]) {
+        this._dom.value = v;
     }
 
     /**
@@ -1059,8 +1067,8 @@ export abstract class ValueAttr<T extends HTMLElementWithSValue | HTMLElementWit
      * @param v The value to be set.
      * @returns This instance.
      */
-    public value(v: V) {
-        (<V>this._dom.value) = v;
+    public value(v: T["value"]): this {
+        this._dom.value = v;
         return this;
     }
 }
@@ -1070,16 +1078,16 @@ export abstract class ValueAttr<T extends HTMLElementWithSValue | HTMLElementWit
  * __Note:__ This is a hybrid attribute: for some elements the type of `width`/`height` is `string`
  * while for others the type is `number`.
  */
-export abstract class WidthHeightAttr<T extends HTMLElementWithSWidthHeight | HTMLElementWithNWidthHeight, EventMap extends EventMapVoid = DefaultEventMap, V = T extends HTMLElementWithSWidthHeight ? string : T extends HTMLElementWithNWidthHeight ? number : never> extends AElementComponent<T, EventMap> {
+export abstract class WidthHeightAttr<T extends HTMLElementWithSWidthHeight | HTMLElementWithNWidthHeight, EventMap extends EventMapVoid = DefaultEventMap> extends AElementComponent<T, EventMap> {
     /**
      * Get/set the `width` attribute value of the component.
      */
-    public get Width(): V {
-        return <V>this._dom.width;
+    public get Width(): T["width"] {
+        return this._dom.width;
     }
     /** @inheritdoc */
-    public set Width(v: V) {
-        (<V>this._dom.width) = v;
+    public set Width(v: T["width"]) {
+        this._dom.width = v;
     }
 
     /**
@@ -1087,20 +1095,20 @@ export abstract class WidthHeightAttr<T extends HTMLElementWithSWidthHeight | HT
      * @param v The value to be set.
      * @returns This instance.
      */
-    public width(v: V): this {
-        (<V>this._dom.width) = v;
+    public width(v: T["width"]): this {
+        this._dom.width = v;
         return this;
     }
 
     /**
      * Get/set the `height` attribute value of the component.
      */
-    public get Height(): V {
-        return <V>this._dom.height;
+    public get Height(): T["height"] {
+        return this._dom.height;
     }
     /** @inheritdoc */
-    public set Height(v: V) {
-        (<V>this._dom.height) = v;
+    public set Height(v: T["height"]) {
+        this._dom.height = v;
     }
 
     /**
@@ -1108,8 +1116,8 @@ export abstract class WidthHeightAttr<T extends HTMLElementWithSWidthHeight | HT
      * @param v The value to be set.
      * @returns This instance.
      */
-    public height(v: V): this {
-        (<V>this._dom.height) = v;
+    public height(v: T["height"]): this {
+        this._dom.height = v;
         return this;
     }
 }

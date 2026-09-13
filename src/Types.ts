@@ -358,6 +358,17 @@ export type HTMLInputsWithMinMax = "date" | "month" | "week" | "time" | "datetim
     | "range";
 
 /**
+ * HTML input element types which can have a `min` and/or `max` attribute of type `string`.
+ */
+export type HTMLInputsWithMinMaxS = "date" | "month" | "week" | "time" | "datetime-local" | "number"
+    | "range";
+
+/**
+ * HTML input element types which can have a `min` and/or `max` attribute of type `number`.
+ */
+export type HTMLInputsWithMinMaxN = HTMLMeterElement;
+
+/**
  * HTML elements which can have a `referrerPolicy` attribute.
  */
 export type HTMLElementWithReferrerPolicy = HTMLAnchorElement | HTMLAreaElement | HTMLIFrameElement
