@@ -36,7 +36,8 @@ import {
     HTMLElementWithTarget,
     HTMLElementWithType,
     NullableNumber,
-    NullableString
+    NullableString,
+    Orientation
 } from "./Types.js";
 
 
@@ -1117,7 +1118,42 @@ export abstract class WidthHeightAttr<T extends HTMLElementWithSWidthHeight | HT
 
 
 /////////////////////////////
-// #region Properties
+// #region Other (common) (DOM) properties
+/**
+ * 'Orientation' getter/setter and set method returning this instance.\
+ * __Note:__ This is _not_ a native DOM attribute but a custom property managed by the component. It
+ * is available for all components which need/want to expose an orientation property.
+ */
+export abstract class OrientationAttr<T extends HTMLElement, EventMap extends EventMapVoid = DefaultEventMap> extends AElementComponent<T, EventMap> {
+    protected _orientation: Orientation = Orientation.HORIZONTAL;
+
+    /**
+     * Get/set the orientation of the component.
+     */
+    public get Orientation(): Orientation {
+        return this._orientation;
+    }
+    /** @inheritdoc */
+    public set Orientation(v: Orientation) {
+        this.orientation(v);
+    }
+
+    /**
+     * Sets the orientation of the component.
+     * @param orientation The new orientation.
+     * @returns This instance.
+     */
+    public orientation(orientation: Orientation): this {
+        if (this._orientation !== orientation) {
+            this._orientation = orientation;
+            this._orientation === Orientation.HORIZONTAL
+                ? this.removeClass("vertical").addClass("horizontal")
+                : this.removeClass("horizontal").addClass("vertical");
+        }
+        return this;
+    }
+}
+
 /**
  * 'SelectionStart' getter/setter and set method returning this instance.
  */
@@ -1169,5 +1205,5 @@ export abstract class SelectionEndProp<T extends HTMLInputElement | HTMLTextArea
         return this;
     }
 }
-// #endregion Properties
+// #endregion Other (common) (DOM) properties
 /////////////////////////////
