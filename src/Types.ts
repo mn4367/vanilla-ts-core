@@ -48,6 +48,19 @@ export type NullableBoolean = boolean | null;
 
 //////////////////////////////
 // #region HTML element types
+
+/** Additional types currently missing in the standard DOM typings. */
+declare global {
+    /** The DOM interface for `<selectedcontent>` elements. */
+    interface HTMLSelectedContentElement extends HTMLElement { } // eslint-disable-line @typescript-eslint/no-empty-object-type
+
+    /** The mapping of HTML tag names to their corresponding element interfaces. */
+    interface HTMLElementTagNameMap {
+        /** The DOM interface for `<selectedcontent>` elements. */
+        "selectedcontent": HTMLSelectedContentElement;
+    }
+}
+
 /**
  * HTML elements which do not allow adding child nodes (void elements).
  * @see https://html.spec.whatwg.org/multipage/syntax.html#void-elements
@@ -74,10 +87,11 @@ export type HTMLElementWithChildren =
     | HTMLLabelElement | HTMLLegendElement | HTMLLIElement | HTMLMapElement | HTMLMenuElement
     | HTMLMeterElement | HTMLObjectElement | HTMLOListElement | HTMLOptGroupElement
     | HTMLOptionElement | HTMLOutputElement | HTMLParagraphElement | HTMLPictureElement
-    | HTMLPreElement | HTMLProgressElement | HTMLScriptElement | HTMLSelectElement | HTMLSlotElement
-    | HTMLSpanElement | HTMLStyleElement | HTMLTableElement | HTMLTableSectionElement
-    | HTMLTemplateElement | HTMLTextAreaElement | HTMLTableCellElement | HTMLTimeElement
-    | HTMLTitleElement | HTMLTableRowElement | HTMLUListElement | HTMLVideoElement;
+    | HTMLPreElement | HTMLProgressElement | HTMLScriptElement | HTMLSelectElement
+    | HTMLSelectedContentElement | HTMLSlotElement | HTMLSpanElement | HTMLStyleElement
+    | HTMLTableElement | HTMLTableSectionElement | HTMLTemplateElement | HTMLTextAreaElement
+    | HTMLTableCellElement | HTMLTimeElement | HTMLTitleElement | HTMLTableRowElement
+    | HTMLUListElement | HTMLVideoElement;
 
 /**
  * Tag names of HTML elements which can have child elements.
@@ -96,8 +110,9 @@ export type HTMLElementWithPhrasingContentTagName =
     | "abbr" | "audio" | "b" | "bdi" | "bdo" | "br" | "button" | "canvas" | "cite" | "code" | "data"
     | "datalist" | "dfn" | "em" | "embed" | "i" | "iframe" | "img" | "input" | "kbd" | "label"
     | "mark" | /*"math" |*/ "meter" | "noscript" | "object" | "output" | "picture" | "progress"
-    | "q" | "ruby" | "s" | "samp" | "script" | "select" | "slot" | "small" | "span" | "strong"
-    | "sub" | "sup" | /*"svg" |*/ "template" | "textarea" | "time" | "u" | "var" | "video" | "wbr";
+    | "q" | "ruby" | "s" | "samp" | "script" | "select" | "selectedcontent" | "slot" | "small"
+    | "span" | "strong" | "sub" | "sup" | /*"svg" |*/ "template" | "textarea" | "time" | "u"
+    | "var" | "video" | "wbr";
 //| "a" | "area" | "del" | "ins" | "link" | "map" | "meta"
 
 /**
@@ -149,8 +164,9 @@ export type HTMLElementWithFlowContentTagName =
     | "iframe" | "img" | "input" | "ins" | "kbd" | "label" | "main" | "map" | "mark"
     | /*"math" |*/ "menu" | "meter" | "nav" | "noscript" | "object" | "ol" | "output" | "p"
     | "picture" | "pre" | "progress" | "q" | "ruby" | "s" | "samp" | "script" | "search" | "section"
-    | "select" | "slot" | "small" | "span" | "strong" | "sub" | "sup" | /*"svg" |*/ "table"
-    | "template" | "textarea" | "time" | "u" | "ul" | "var" | "video" | "wbr";
+    | "select" | "selectedcontent" | "slot" | "small" | "span" | "strong" | "sub" | "sup"
+    | /*"svg" |*/ "table" | "template" | "textarea" | "time" | "u" | "ul" | "var" | "video"
+    | "wbr";
 // | "area" | "link" | "meta";
 
 /**
