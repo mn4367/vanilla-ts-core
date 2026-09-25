@@ -519,6 +519,11 @@ export abstract class ANodeComponent<T extends Node, EventMap extends EventMapVo
  * @see {@link IGlobalDOMAttributes}
  */
 export abstract class AGlobalDOMAttributes<T extends HTMLElement, EventMap extends EventMapVoid = DefaultEventMap> extends ANodeComponent<T, EventMap> implements IGlobalDOMAttributes {
+    /** Tracks whether the `inert` state was explicitly set through the component API. */
+    protected abstract _explicitInert: boolean;
+    /** Synchronizes the `inert` state of the component with the underlying DOM element. */
+    protected abstract syncInert(): void;
+
     /** @inheritdoc */
     public get AutoCapitalize(): AutoCapitalizeAttrValues {
         return <AutoCapitalizeAttrValues>this._dom.autocapitalize;
@@ -660,12 +665,14 @@ export abstract class AGlobalDOMAttributes<T extends HTMLElement, EventMap exten
     }
     /** @inheritdoc */
     public set Inert(v: boolean) {
-        this._dom.inert = v;
+        this._explicitInert = v;
+        this.syncInert();
     }
 
     /** @inheritdoc */
     public inert(v: boolean): this {
-        this._dom.inert = v;
+        this._explicitInert = v;
+        this.syncInert();
         return this;
     }
 
@@ -841,6 +848,11 @@ export abstract class AElementComponent<T extends (HTMLElementWithChildren | HTM
     protected _disabled: boolean = false;
     /** The internal flag holding the parentDisabled state of the element. */
     protected _parentDisabled: boolean = false;
+    /**
+     * Internal flag indicating whether the element was explicitly set to be inert (by the global
+     * DOM attribute from `GlobalDOMAttributes`).
+     */
+    protected _explicitInert: boolean = false;
     /** The current state of visibility. */
     protected _visible = true;
     /** The last state of `this._dom.style.display`. */
@@ -1001,11 +1013,24 @@ export abstract class AElementComponent<T extends (HTMLElementWithChildren | HTM
     public disabled(disabled: boolean): this {
         if (disabled !== this._disabled) {
             this._disabled = disabled;
-            this._disabled
-                ? this.addClass("disabled")
-                : this.removeClass("disabled");
+            if (this._disabled) {
+                this.addClass("disabled");
+                this._dom.ariaDisabled = "true";
+            } else {
+                this.removeClass("disabled");
+                this._dom.removeAttribute("aria-disabled");
+            }
+            this.syncInert();
         }
         return this;
+    }
+
+    /**
+     * Synchronizes the `inert` property of the DOM element based on the explicit `inert` state and
+     * the current disabled state.
+     */
+    protected syncInert(): void {
+        this._dom.inert = this._explicitInert || this._disabled;
     }
 
     /** @inheritdoc */

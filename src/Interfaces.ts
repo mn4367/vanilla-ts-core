@@ -178,13 +178,18 @@ export interface IGlobalDOMAttributes {
     id(v: NullableString): this;
 
     /**
-     * Get/set inert attribute value of the component.
+     * Get/set `inert` attribute value of the component. The getter _always_ reflects the current
+     * `inert` state of the underlying DOM element. Setting `inert` to `false` may be ignored if the
+     * component is currently disabled. In fact, this is the expected behavior to ensure that
+     * disabled components (like e.g. links) cannot silently be made interactive by removing its
+     * `inert` state.
      */
     Inert: boolean;
 
     /**
      * Set `inert` attribute value of the component.
      * @param v The `inert` value to be set.
+     * @see {@link IGlobalDOMAttributes.Inert}
      * @returns This instance.
      */
     inert(v: boolean): this;
