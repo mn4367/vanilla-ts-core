@@ -165,6 +165,19 @@ export interface IGlobalDOMAttributes {
     enterKeyHint(v: EnterKeyHintAttrValues): this;
 
     /**
+     * Get/set `exportparts` attribute value of the component. Setting an empty array will remove
+     * the attribute, getting an empty array indicates, that the attribute doesn't exist.
+     */
+    ExportParts: string[];
+
+    /**
+     * Set `exportparts` attribute value of the component.
+     * @param v The value to be set. An empty array will remove the attribute.
+     * @returns This instance.
+     */
+    exportParts(v: string[]): this;
+
+    /**
      * Get/set `id` attribute value of the component. Setting `null` or an empty string will remove
      * the attribute, getting `null` indicates, that the attribute doesn't exist.
      */
@@ -232,6 +245,20 @@ export interface IGlobalDOMAttributes {
      */
     nonce(v: NullableString): this;
 
+
+    /**
+     * Get/set `part` attribute value of the component. Setting an empty array will remove the
+     * attribute, getting an empty array indicates, that the attribute doesn't exist.
+     */
+    Part: string[];
+
+    /**
+     * Set `part` attribute value of the component.
+     * @param v The value to be set. An empty array will remove the attribute.
+     * @returns This instance.
+     */
+    part(v: string[]): this;
+
     /**
      * Get/set `popover` attribute value of the component.
      */
@@ -268,6 +295,30 @@ export interface IGlobalDOMAttributes {
      * @see https://developer.mozilla.org/en-US/docs/Web/CSS/resize
      */
     resizable(v: ResizableValues): this;
+
+    /**
+     * Get/set `role` attribute value of the component.
+     */
+    Role: NullableString;
+
+    /**
+     * Set `role` attribute value of the component.
+     * @param v The value to be set. `null` or an empty string will remove the attribute.
+     * @returns This instance.
+     */
+    role(v: NullableString): this;
+
+    /**
+     * Get/set `slot` attribute value of the component.
+     */
+    Slot: NullableString;
+
+    /**
+     * Set `slot` attribute value of the component.
+     * @param v The value to be set. `null` or an empty string will remove the attribute.
+     * @returns This instance.
+     */
+    slot(v: NullableString): this;
 
     /**
      * Get/set `spellcheck` attribute value of the component.\

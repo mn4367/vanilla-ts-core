@@ -645,6 +645,25 @@ export abstract class AGlobalDOMAttributes<T extends HTMLElement, EventMap exten
     }
 
     /** @inheritdoc */
+    public get ExportParts(): string[] {
+        return !this._dom.hasAttribute("exportparts") ? [] : (this._dom.getAttribute("exportparts") || "").split(",").map(e => e.trim());
+    }
+    /** @inheritdoc */
+    public set ExportParts(v: string[]) {
+        this.exportParts(v);
+    }
+
+    /** @inheritdoc */
+    public exportParts(v: string[]): this {
+        if (!v || v.length === 0) {
+            this._dom.removeAttribute("exportparts");
+        } else {
+            this._dom.setAttribute("exportparts", v.map(e => e.trim()).join(","));
+        }
+        return this;
+    }
+
+    /** @inheritdoc */
     public get ID(): NullableString {
         return !this._dom.hasAttribute("id") ? null : this._dom.id;
     }
@@ -724,6 +743,25 @@ export abstract class AGlobalDOMAttributes<T extends HTMLElement, EventMap exten
     }
 
     /** @inheritdoc */
+    public get Part(): string[] {
+        return !this._dom.hasAttribute("part") ? [] : (this._dom.getAttribute("part") || "").split(" ").map(e => e.trim()).filter(e => e.length > 0);
+    }
+    /** @inheritdoc */
+    public set Part(v: string[]) {
+        this.part(v);
+    }
+
+    /** @inheritdoc */
+    public part(v: string[]): this {
+        if (v.length === 0) {
+            this._dom.removeAttribute("part");
+        } else {
+            this._dom.setAttribute("part", v.map(e => e.trim()).filter(e => e.length > 0).join(" "));
+        }
+        return this;
+    }
+
+    /** @inheritdoc */
     public get Popover(): PopoverAttrValues {
         return <PopoverAttrValues>this._dom.popover;
     }
@@ -750,6 +788,36 @@ export abstract class AGlobalDOMAttributes<T extends HTMLElement, EventMap exten
     /** @inheritdoc */
     public resizable(v: ResizableValues): this {
         v === false ? this._dom.style.removeProperty("resize") : this._dom.style.resize = v;
+        return this;
+    }
+
+    /** @inheritdoc */
+    public get Role(): NullableString {
+        return this._dom.role;
+    }
+    /** @inheritdoc */
+    public set Role(v: NullableString) {
+        this.role(v);
+    }
+
+    /** @inheritdoc */
+    public role(v: NullableString): this {
+        this._dom.role = v;
+        return this;
+    }
+
+    /** @inheritdoc */
+    public get Slot(): NullableString {
+        return !this._dom.hasAttribute("slot") ? null : this._dom.slot;
+    }
+    /** @inheritdoc */
+    public set Slot(v: NullableString) {
+        this.slot(v);
+    }
+
+    /** @inheritdoc */
+    public slot(v: NullableString): this {
+        v === null || v === "" ? this._dom.removeAttribute("slot") : this._dom.slot = v;
         return this;
     }
 
