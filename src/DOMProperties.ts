@@ -1133,7 +1133,7 @@ export abstract class WidthHeightAttr<T extends HTMLElementWithSWidthHeight | HT
  * is available for all components which need/want to expose an orientation property.
  */
 export abstract class OrientationAttr<T extends HTMLElement, EventMap extends EventMapVoid = DefaultEventMap> extends AElementComponent<T, EventMap> {
-    protected _orientation: Orientation = Orientation.HORIZONTAL;
+    protected _orientation: Orientation = Orientation.NONE;
 
     /**
      * Get/set the orientation of the component.
@@ -1154,9 +1154,23 @@ export abstract class OrientationAttr<T extends HTMLElement, EventMap extends Ev
     public orientation(orientation: Orientation): this {
         if (this._orientation !== orientation) {
             this._orientation = orientation;
-            this._orientation === Orientation.HORIZONTAL
-                ? this.removeClass("vertical").addClass("horizontal")
-                : this.removeClass("horizontal").addClass("vertical");
+            this.removeClass("horizontal", "vertical").DOM.ariaOrientation = null;
+            switch (this._orientation) {
+                case Orientation.HORIZONTAL:
+                    this.addClass("horizontal");
+                    break;
+                case Orientation.VERTICAL:
+                    this.addClass("vertical");
+                    break;
+                case Orientation.ARIA_HORIZONTAL:
+                    this.addClass("horizontal").DOM.ariaOrientation = "horizontal";
+                    break;
+                case Orientation.ARIA_VERTICAL:
+                    this.addClass("vertical").DOM.ariaOrientation = "vertical";
+                    break;
+                default: // Orientation.NONE
+                    break;
+            }
         }
         return this;
     }

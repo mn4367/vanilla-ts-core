@@ -145,7 +145,7 @@ export abstract class AComponent implements IComponent {
  */
 export abstract class ANodeComponent<T extends Node, EventMap extends EventMapVoid = DefaultEventMap> extends AComponent implements INodeComponent<T, EventMap> {
     /** The underlying node or element. */
-    protected _dom!: T;
+    protected _dom: T;
     /** The parent component. */
     protected _parent?: IElementWithChildrenComponent<HTMLElementWithChildren> = undefined;
     /** An array holding the currently assigned event handlers. */
@@ -153,7 +153,14 @@ export abstract class ANodeComponent<T extends Node, EventMap extends EventMapVo
 
     /** @inheritdoc */
     public get DOM(): T {
-        return this._dom;
+        if (this._dom) {
+            return this._dom;
+        }
+        throw new Error(
+            this.Disposed
+                ? `Instance of '${this.ClassName}' is already disposed of.`
+                : `Instance of '${this.ClassName}' is not yet initialized or in an undefined state.`
+        );
     }
 
     /** @inheritdoc */
@@ -1967,7 +1974,8 @@ export interface AElementComponentWithChildren<T extends HTMLElementWithChildren
  * }
  * ```
  */
-export abstract class AElementComponentWithInternalUI<UI extends (IElementComponent<HTMLElement> & IChildren), EventMap extends EventMapVoid = DefaultEventMap> extends AElementComponent<HTMLElement, EventMap> {
+export abstract class AElementComponentWithInternalUI<UI extends (IElementComponent<HTMLElement> & IChildren), EventMap extends EventMapVoid = DefaultEventMap> extends AElementComponent<UI["DOM"], EventMap> {
+    // export abstract class AElementComponentWithInternalUI<UI extends (IElementComponent<HTMLElement> & IChildren), EventMap extends EventMapVoid = DefaultEventMap> extends AElementComponent<HTMLElement, EventMap> {
     /** The container which constitutes the component tree/user interface of the component. */
     protected ui: UI;
     #mountUI: boolean;

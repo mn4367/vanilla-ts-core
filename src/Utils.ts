@@ -1,4 +1,7 @@
 import {
+    ANodeComponent
+} from "./Classes.js";
+import {
     IComponent,
     IComponentFactory,
     INodeComponent
@@ -318,6 +321,22 @@ export function tabKeyFocusCycle(elem: HTMLElement, ev: KeyboardEvent, preventPr
         }
     }
 }
+
+/**
+ * Checks whether the text direction of a component is right-to-left (RTL).\
+ * __Note:__ This function will cause an error if `component` is `null`, `undefined`, not an
+ * instance of `HTMLElement`, incompatible with `{ DOM: HTMLElement; }` or if accessing
+ * `component.DOM` isn't possible.
+ * @param component The component or HTML element whose text direction is to be checked.
+ * @returns `true` if the component's text direction is right-to-left (RTL), otherwise `false`.
+ */
+export function isRTL(component: ANodeComponent<HTMLElement> | HTMLElement): boolean {
+    return (component instanceof HTMLElement
+        ? component.ownerDocument.defaultView?.getComputedStyle(component).direction
+        : component.DOM.ownerDocument.defaultView?.getComputedStyle(component.DOM).direction
+    ) === "rtl";
+}
+
 
 /**
  * Get a rectangle (`DOMRect`) that contains the position and size of an HTML element The position

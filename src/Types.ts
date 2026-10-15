@@ -478,8 +478,11 @@ export type ResizableValues = false | "none" | "both" | "horizontal" | "vertical
 // #region Misc
 /** Orientation (of a component). */
 export enum Orientation {
-    HORIZONTAL = 0,
-    VERTICAL = 1
+    NONE = 0,
+    HORIZONTAL = 1,
+    VERTICAL = 2,
+    ARIA_HORIZONTAL = 3,
+    ARIA_VERTICAL = 4
 }
 
 /**

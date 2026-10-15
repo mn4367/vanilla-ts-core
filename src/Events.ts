@@ -244,3 +244,11 @@ export class PointerHoldEvent extends ACustomComponentEvent<"pointerhold", ANode
         return result;
     }
 }
+
+/**
+ * Custom 'value' event with a configurable value type for components.
+ */
+export class ValueEvent<S extends INodeComponent<Node>, T, D extends object = {
+    /** The `Value` payload of the event. */
+    Value: T;
+}> extends ACustomComponentEvent<"value", S, D> { }
