@@ -1177,6 +1177,33 @@ export abstract class OrientationAttr<T extends HTMLElement, EventMap extends Ev
 }
 
 /**
+ * An orientation mixin that chooses the ARIA orientation variant or the normal orientation
+ * depending on the ARIA role of the DOM element of the component. If this is mixed in to a
+ * component in addition to the `OrientationAttr` mixin (after it!), it will automatically choose
+ * the appropriate orientation variant.
+ */
+export abstract class AriaOrientationAttr extends OrientationAttr<HTMLElement> {
+    /** @inheritdoc */
+    public override orientation(v: Orientation): this {
+        const vertical = v === Orientation.VERTICAL || v === Orientation.ARIA_VERTICAL;
+        const hasARIAOrientation = [
+            "scrollbar", "select", "separator", "slider", "tablist", "toolbar", "listbox", "menu",
+            "menubar", "radiogroup", "tree", "treegrid"
+        ].includes(this.DOM.role!);
+        return super.orientation(
+            v === Orientation.NONE
+                ? Orientation.NONE
+                : hasARIAOrientation
+                    ? vertical
+                        ? Orientation.ARIA_VERTICAL
+                        : Orientation.ARIA_HORIZONTAL
+                    : vertical
+                        ? Orientation.VERTICAL
+                        : Orientation.HORIZONTAL);
+    }
+}
+
+/**
  * 'SelectionStart' getter/setter and set method returning this instance.
  */
 export abstract class SelectionStartProp<T extends HTMLInputElement | HTMLTextAreaElement, EventMap extends EventMapVoid = DefaultEventMap> extends AElementComponent<T, EventMap> {
