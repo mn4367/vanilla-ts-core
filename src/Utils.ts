@@ -1,16 +1,20 @@
 import {
+    AElementComponent,
+    AElementComponentWithChildren,
     ANodeComponent
 } from "./Classes.js";
 import {
     IComponent,
     IComponentFactory,
+    IIsElementComponent,
     INodeComponent
 } from "./Interfaces.js";
 import {
     AnyType,
     Constructor,
     Ctor,
-    HTMLElementWithDisabled
+    HTMLElementWithDisabled,
+    Orientation
 } from "./Types.js";
 
 
@@ -284,7 +288,8 @@ const tabbableElementsSelector = [
  * returns many elements. Therefore, this function should only be used in sub sections of an app
  * like in a dialog or in panels which require tab key trapping.
  * @param elem The HTML element within which the tab key cycle is to be applied.
- * @param ev The keyboard event that triggered the tab key cycle.
+ * @param ev The keyboard event that triggered the tab key cycle. If the event's default action has
+ * already been prevented, the function will return immediately.
  * @param preventPropagation If `true`, the event propagation will be stopped when the tab key cycle
  * is applied. Default: `true`.
  * @param selector A CSS selector that selects all tabbable elements within `elem`.\
@@ -294,15 +299,18 @@ const tabbableElementsSelector = [
  * @todo Improve the implementation to cover more cases of tabbable elements.
  */
 export function tabKeyFocusCycle(elem: HTMLElement, ev: KeyboardEvent, preventPropagation: boolean = true, selector: string = tabbableElementsSelector): void {
+    if (ev.defaultPrevented) {
+        return;
+    }
     const tabbableElements = Array.from(elem.querySelectorAll(selector))
         .filter(e => {
             return e instanceof HTMLElement
                 && !e.classList.contains("disabled")
                 && !(<HTMLElementWithDisabled>e).disabled
-                && !e.hidden
                 && !e.inert
-                && e.style.display !== "none"
-                && e.style.visibility !== "hidden"
+                && !e.hidden
+                && e.ownerDocument.defaultView?.getComputedStyle(e).visibility !== "hidden"
+                && e.ownerDocument.defaultView?.getComputedStyle(e).display !== "none"
                 && (e.hasAttribute("contenteditable") ? ["", "true"].includes(e.contentEditable.trim().toLowerCase()) : true);
         });
     const firstTabbableElement = <HTMLElement>tabbableElements[0];
@@ -323,6 +331,53 @@ export function tabKeyFocusCycle(elem: HTMLElement, ev: KeyboardEvent, preventPr
 }
 
 /**
+ * Cycles the focus among child components of a parent component using arrow keys. This means that
+ * pressing the arrow keys will move the focus to the next or previous child component based on the
+ * orientation and the key pressed. If the orientation is evaluated to be horizontal the left and
+ * right arrow keys will be used for moving the focus among child components. If the document
+ * direction is right-to-left, the left and right arrow keys will be reversed. With a vertical
+ * orientation, the up and down arrow keys will be used. If the focus is on the first or last child
+ * component, it will wrap around to the last or first child component, respectively.
+ * @param ev The keyboard event that triggered the arrow key cycle. If the event's default action
+ * has already been prevented or one of the keys `Alt`, `Ctrl`, `Meta`, or `Shift` is pressed, the
+ * function will return immediately.
+ * @param parent The parent component that contains the child components.
+ * @param index The index of the currently focused child component within the `children` array.
+ * @param children The child components among which focus should cycle. If this is `undefined` the
+ * `ElementChildren` property of the parent component will be used.
+ * @param preventPropagation If `true`, the event propagation will be stopped when the arrow key
+ * cycle is applied. Default: `false`.
+ */
+export function arrowKeyFocusCycle(ev: KeyboardEvent, parent: AElementComponentWithChildren<HTMLElement>, index: number, children?: (AElementComponent<HTMLElement> | IIsElementComponent)[], preventPropagation: boolean = false): void {
+    if (ev.defaultPrevented || ev.altKey || ev.ctrlKey || ev.metaKey || ev.shiftKey) {
+        return;
+    }
+    if (!children) {
+        children = parent.ElementChildren;
+    }
+    if (index < 0 || index >= children.length) {
+        return;
+    }
+    const orientation = (<AElementComponentWithChildren<HTMLElement> & { readonly Orientation: Orientation; }>parent).Orientation; // eslint-disable-line jsdoc/require-jsdoc
+    const horizontal = orientation === Orientation.HORIZONTAL || orientation === Orientation.ARIA_HORIZONTAL || orientation === Orientation.NONE || orientation === undefined;
+    let step = ev.key === (horizontal ? "ArrowRight" : "ArrowDown")
+        ? 1
+        : ev.key === (horizontal ? "ArrowLeft" : "ArrowUp")
+            ? -1
+            : 0;
+    if (step === 0) {
+        return;
+    }
+    if (horizontal && parent.DOM.ownerDocument.defaultView?.getComputedStyle(parent.DOM).direction === "rtl") {
+        step = -step;
+    }
+    ev.preventDefault();
+    preventPropagation && ev.stopImmediatePropagation();
+    const next = children[(index + step + children.length) % children.length];
+    next?.focus();
+}
+
+/**
  * Checks whether the text direction of a component is right-to-left (RTL).\
  * __Note:__ This function will cause an error if `component` is `null`, `undefined`, not an
  * instance of `HTMLElement`, incompatible with `{ DOM: HTMLElement; }` or if accessing
@@ -336,7 +391,6 @@ export function isRTL(component: ANodeComponent<HTMLElement> | HTMLElement): boo
         : component.DOM.ownerDocument.defaultView?.getComputedStyle(component.DOM).direction
     ) === "rtl";
 }
-
 
 /**
  * Get a rectangle (`DOMRect`) that contains the position and size of an HTML element The position
